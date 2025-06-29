@@ -11,7 +11,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:supabase": "node scripts/test-supabase-connection.js",
+    "db:migrate": "echo 'Run migrations in Supabase dashboard or use Supabase CLI'"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -33,6 +35,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "eslint-config-prettier": "^10.1.5",
