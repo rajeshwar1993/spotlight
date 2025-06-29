@@ -81,7 +81,7 @@ To democratize professional portfolio creation for actors and models by providin
 - **Multi-language Support:** English (default) and Spanish
 - **Locale Management:** Custom cookie management (1-year expiration)
 - **Type Safety:** TypeScript integration for translation keys
-- **URL Structure:** All pages under `[locale]` slug except portfolio pages
+- **URL Structure:** All pages under `[locale]` slug except mypage pages
 - **Fallback Strategy:** Browser locale detection with English fallback
 - **Future Expansion Ready:** Architecture supports additional languages
 
@@ -259,7 +259,7 @@ GET    /api/images/[id]            // Get image metadata
 ### 5.6 Public Endpoints
 ```typescript
 GET    /api/public/featured        // Get featured portfolios
-GET    /api/public/portfolio/[slug] // Get public portfolio data
+GET    /api/public/mypage/[slug]    // Get public portfolio data
 POST   /api/public/view/[slug]     // Increment view count
 ```
 
@@ -455,7 +455,7 @@ Sign Out (bottom of drawer on mobile)
 - Publish/unpublish toggle
 - Delete portfolio (with confirmation)
 
-### 6.5 Portfolio Page (`/portfolio/[slug]`)
+### 6.5 Portfolio Page (`/mypage/[slug]`)
 
 **Type:** Static Site Generation (SSG)  
 **Authentication:** Public  
@@ -472,7 +472,7 @@ Sign Out (bottom of drawer on mobile)
   "jobTitle": "{{profession}}",
   "description": "{{bio}}",
   "image": "{{hero_image_url}}",
-  "url": "{{portfolio_url}}"
+  "url": "{{mypage_url}}"
 }
 </script>
 
@@ -480,7 +480,7 @@ Sign Out (bottom of drawer on mobile)
 <meta property="og:title" content="{{display_name}} - Portfolio">
 <meta property="og:description" content="{{bio_excerpt}}">
 <meta property="og:image" content="{{hero_image_url}}">
-<meta property="og:url" content="{{portfolio_url}}">
+<meta property="og:url" content="{{mypage_url}}">
 <meta property="og:type" content="profile">
 
 <!-- Twitter Card -->
@@ -494,7 +494,7 @@ Sign Out (bottom of drawer on mobile)
 - Critical CSS inlining
 - Image optimization with WebP
 - Lazy loading for below-fold content
-- Prefetching for related portfolios
+- Prefetching for related mypages
 - Service worker caching
 
 ### 6.6 Profile Page (`/[locale]/profile`)
