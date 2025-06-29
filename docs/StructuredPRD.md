@@ -286,14 +286,14 @@ POST   /api/public/view/[slug]     // Increment view count
 **Authenticated Menu Items:**
 ```
 Section 1:
-   Create New Portfolio
-   View My Portfolios
+Create New Portfolio
+View My Portfolios
 
 Section 2:
-   Profile & Settings
+Profile & Settings
 
 Section 3:
-   Sign Out (bottom of drawer on mobile)
+Sign Out (bottom of drawer on mobile)
 ```
 
 #### 6.1.2 Main Content Sections
@@ -420,7 +420,7 @@ Section 3:
 - Template-specific rendering
 
 **Actions:**
-- Edit button ’ Navigate to edit page
+- Edit button ï¿½ Navigate to edit page
 - Publish toggle button
 - Share button with copy-to-clipboard
 - View public version link
