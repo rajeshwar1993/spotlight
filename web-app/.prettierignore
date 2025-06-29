@@ -1,0 +1,11 @@
+node_modules
+.next
+.vercel
+build
+dist
+*.tsbuildinfo
+*.log
+.env*
+.git
+package-lock.json
+yarn.lock
