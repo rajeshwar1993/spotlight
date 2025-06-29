@@ -216,7 +216,7 @@ Functional Requirements:
 
         - Footer
             - General social media links
-            - Will work on this more in phase 2
+            - Will work on this more in Day 2
 
     - Create New page
         - Overview: This page will contain the flow to create a new My page (portfolio page)
@@ -225,7 +225,7 @@ Functional Requirements:
         - Should not be a protected page behind auth
         - This will be a full page design and will not have the geenral Narbar or Footer, so better is to create a separate layout for this.
         - Page Flow:
-            - It will be a 3 step form with progress bar
+            - It will be a 3 step form with progress bar. Show fade animations between step transitions.
             - Step 1: Name + Hero Image
                 - This step will take in the Name to be displayed and Hero Image
                 - Hero image component will be an image piker with drag and drop support
@@ -236,7 +236,7 @@ Functional Requirements:
             - Step 3: Bio
                 - A short bio - Max 300 words
                 - For Phase 1 we will just save the bio as it is
-                - In Phase 2 we will feed it to an AI API go generate all the fields in the template and give easy edit access
+                - In Day 2 we will feed it to an AI API go generate all the fields in the template and give easy edit access
                 - Create Preview Button
                     - Authenticated:
                         - On click on the "Create Preview" Button: Submit API should upload the Hero image (sane in storate) and save the data entered. 
@@ -269,11 +269,21 @@ Functional Requirements:
         - The main content will be a form with all the editable fields in the template.
 
     - My page (Prtfolio Page)
-        - Overview: This is the main feature page in the project. This will be a SSG generated page from the my_page table. This should be SEO friendly and searcable. 
-        - URL: /[local]/mypage/[my_page_slug]
+        - Overview: This is the main feature page in the project. This will be a SSG generated page from the my_page table. This should be SEO friendly and searcable. Use Schema.org markup for SEO and Open Graph meta tags.
+        - URL: /mypage/[my_page_slug]
+        - This page will not be under locale slug and will always be in English
         - Should be a SSG rendered page
         - Should NOT be a protected page behind auth
         - This should be a page rendered at the time of build. Incase there is a miss the slug, it should be rendered at runtime from server.
+
+    - Profile Page
+        - Overview: This page will have the Mypage list and personal details of the user
+        - URL: /[local]/profile
+        - Should be a client rendered page
+        - Should be a protected page behind auth 
+        - Two sections in this page
+            - First shows all the pages user has created
+            - Second show the personal details like Name, Dob, Phone number etc. They can edit these details as well.
 
 
 - Template Logic
