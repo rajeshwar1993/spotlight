@@ -28,7 +28,7 @@ To democratize professional portfolio creation for actors and models by providin
 ## 2. Technical Stack
 
 ### 2.1 Core Technologies
-- **Frontend:** Next.js 14+ (App Router)
+- **Frontend:** Next.js 15+ (App Router)
 - **Backend:** Supabase (Authentication, Database, Storage, Edge Functions)
 - **Styling:** Tailwind CSS + shadcn/ui components
 - **Language:** TypeScript
@@ -221,6 +221,9 @@ POST /auth/signout
 POST /auth/reset-password
 POST /auth/verify-email
 GET  /auth/session
+
+// Custom email verification endpoint
+POST /api/auth/resend-verification    // Resend verification email
 ```
 
 ### 5.2 User Management Endpoints
@@ -853,6 +856,71 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 ```
+
+### 10.4 Email Verification Requirements
+
+#### 10.4.1 Email Verification Flow
+**Non-blocking Approach:** Users can access all features except publishing portfolios without email verification.
+
+**Verification States:**
+- **Verified:** `auth.users.email_confirmed_at` is not null
+- **Unverified:** `auth.users.email_confirmed_at` is null
+
+#### 10.4.2 Announcement Banner System
+```typescript
+// Configurable announcement component
+interface AnnouncementBannerProps {
+  type: 'warning' | 'info' | 'success' | 'error';
+  title: string;
+  message: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+    loading?: boolean;
+  };
+  dismissible?: boolean;
+  persistent?: boolean;
+}
+
+export const AnnouncementBanner = ({ 
+  type, 
+  title, 
+  message, 
+  action, 
+  dismissible = false,
+  persistent = true 
+}: AnnouncementBannerProps) => {
+  // Component implementation
+};
+```
+
+#### 10.4.3 Email Verification Banner
+**Trigger Conditions:**
+- User is authenticated
+- `email_confirmed_at` is null
+- Banner appears below navbar on all authenticated pages
+
+**Banner Content:**
+- **Title:** "Email Verification Required"
+- **Message:** "Please verify your email address to publish portfolios. You can still create and edit portfolios."
+- **Action Button:** "Resend Verification Email"
+- **Loading States:** Show spinner when resending email
+
+#### 10.4.4 Publishing Restrictions
+**Blocked Actions:**
+- Portfolio publishing (`PATCH /api/portfolios/[id]/publish`)
+- Only when `email_confirmed_at` is null
+
+**Allowed Actions:**
+- Portfolio creation, editing, preview
+- Profile management
+- Template selection
+- Image uploads
+
+**User Feedback:**
+- Disabled publish button with tooltip explaining verification requirement
+- Clear error messages when attempting to publish
+- Link to resend verification email
 
 ## 11. Day 2 Features & Future Enhancements
 
