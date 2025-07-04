@@ -2,7 +2,7 @@
 // This file should be auto-generated from the database schema
 
 // Database Enums
-export type UserRole = 'ACTOR' | 'MODEL' | 'BOTH';
+export type Profession = 'ACTOR' | 'MODEL' | 'BOTH';
 export type GenderType = 'MALE' | 'FEMALE' | 'NON_BINARY' | 'PREFER_NOT_TO_SAY';
 export type ImageType = 'PROFILE' | 'HERO' | 'GALLERY' | 'INTERNAL';
 export type TemplateType = 'T1' | 'T2' | 'T3' | 'T4';
@@ -13,7 +13,7 @@ export interface DatabaseUser {
   id: string;
   email: string;
   full_name: string | null;
-  role: UserRole;
+  profession: Profession;
   gender: GenderType | null;
   date_of_birth: string | null;
   location: string | null;
@@ -134,7 +134,7 @@ export interface Database {
       [_ in never]: never;
     };
     Enums: {
-      user_role: UserRole;
+      profession: Profession;
       gender_type: GenderType;
       image_type: ImageType;
       template_type: TemplateType;

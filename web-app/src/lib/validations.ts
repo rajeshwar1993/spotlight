@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserRole, Gender, TemplateType, ImageType, PortfolioStatus } from '@/types';
+import { Profession, Gender, TemplateType, ImageType, PortfolioStatus } from '@/types';
 import { FORM_LIMITS } from './constants';
 
 // Authentication schemas
@@ -36,7 +36,7 @@ export const portfolioStep1Schema = z.object({
       `Name must be no more than ${FORM_LIMITS.fullName.max} characters`
     ),
   email: z.string().email('Invalid email address'),
-  role: z.nativeEnum(UserRole, { required_error: 'Please select a role' }),
+  profession: z.nativeEnum(Profession, { required_error: 'Please select a profession' }),
   location: z
     .string()
     .max(
@@ -191,7 +191,7 @@ export const imageUpdateSchema = z.object({
 // User profile schema with all fields
 export const userProfileSchema = z.object({
   full_name: z.string().min(1).max(255).optional(),
-  role: z.nativeEnum(UserRole),
+  profession: z.nativeEnum(Profession),
   gender: z.nativeEnum(Gender).optional(),
   date_of_birth: z.string().date().optional(),
   location: z.string().max(255).optional(),

@@ -4,7 +4,7 @@ import type {
   DatabasePortfolio, 
   DatabaseImage, 
   DatabaseAnnouncement,
-  UserRole as DbUserRole,
+  Profession as DbProfession,
   GenderType as DbGenderType,
   ImageType as DbImageType,
   TemplateType as DbTemplateType,
@@ -12,14 +12,14 @@ import type {
 } from './database';
 
 // Re-export database enums for consistency
-export type UserRole = DbUserRole;
+export type Profession = DbProfession;
 export type Gender = DbGenderType;
 export type ImageType = DbImageType;
 export type TemplateType = DbTemplateType;
 export type PortfolioStatus = DbPortfolioStatus;
 
 // Enum objects for use in components
-export const UserRole = {
+export const Profession = {
   ACTOR: 'ACTOR' as const,
   MODEL: 'MODEL' as const,
   BOTH: 'BOTH' as const,
@@ -58,7 +58,7 @@ export interface User {
   email: string;
   full_name?: string | null;
   avatar_url?: string | null;
-  role: UserRole;
+  profession: Profession;
   gender?: Gender | null;
   date_of_birth?: string | null;
   location?: string | null;
@@ -150,7 +150,7 @@ export interface CreatePortfolioForm {
   step1: {
     full_name: string;
     email: string;
-    role: UserRole;
+    profession: Profession;
     location?: string;
   };
   step2: {

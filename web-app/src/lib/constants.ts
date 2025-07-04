@@ -46,7 +46,7 @@ export const TEMPLATE_NAMES = {
   T4: 'Creative Artistic',
 } as const;
 
-export const ROLE_LABELS = {
+export const PROFESSION_LABELS = {
   ACTOR: 'Actor',
   MODEL: 'Model',
   BOTH: 'Actor & Model',
