@@ -33,10 +33,10 @@ export const Gender = {
 };
 
 export const ImageType = {
-  HEADSHOT: 'HEADSHOT' as const,
-  BODY_SHOT: 'BODY_SHOT' as const,
-  PORTFOLIO: 'PORTFOLIO' as const,
   PROFILE: 'PROFILE' as const,
+  HERO: 'HERO' as const,
+  GALLERY: 'GALLERY' as const,
+  INTERNAL: 'INTERNAL' as const,
 };
 
 export const TemplateType = {

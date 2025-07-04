@@ -60,8 +60,8 @@ export const GENDER_LABELS = {
 } as const;
 
 export const IMAGE_TYPE_LABELS = {
-  HEADSHOT: 'Headshot',
-  FULL_BODY: 'Full Body',
-  PORTFOLIO: 'Portfolio',
-  PROFILE: 'Profile',
+  PROFILE: 'Profile Photo',
+  HERO: 'Hero Image',
+  GALLERY: 'Gallery Image',
+  INTERNAL: 'Internal Use',
 } as const;

@@ -4,7 +4,7 @@
 // Database Enums
 export type UserRole = 'ACTOR' | 'MODEL' | 'BOTH';
 export type GenderType = 'MALE' | 'FEMALE' | 'NON_BINARY' | 'PREFER_NOT_TO_SAY';
-export type ImageType = 'HEADSHOT' | 'BODY_SHOT' | 'PORTFOLIO' | 'PROFILE';
+export type ImageType = 'PROFILE' | 'HERO' | 'GALLERY' | 'INTERNAL';
 export type TemplateType = 'T1' | 'T2' | 'T3' | 'T4';
 export type PortfolioStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 
