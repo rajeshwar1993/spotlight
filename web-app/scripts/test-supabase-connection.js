@@ -56,6 +56,10 @@ async function testSupabaseConnection() {
   requiredEnvVars.forEach(varName => {
     if (process.env[varName]) {
       logSuccess(`${varName} is set`);
+      // Check if it looks like a valid JWT
+      if (varName.includes('KEY') && !process.env[varName].startsWith('eyJ')) {
+        logWarning(`${varName} doesn't look like a valid JWT token`);
+      }
     } else {
       logError(`${varName} is missing`);
       missingVars.push(varName);
@@ -67,16 +71,20 @@ async function testSupabaseConnection() {
     return;
   }
 
-  // Initialize Supabase client
+  // Initialize Supabase clients
   logHeader('Initializing Supabase Client');
   
-  let supabase;
+  let supabase, supabaseAdmin;
   try {
     supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
-    logSuccess('Supabase client initialized successfully');
+    supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    logSuccess('Supabase clients initialized successfully');
   } catch (error) {
     logError(`Failed to initialize Supabase client: ${error.message}`);
     return;
@@ -88,7 +96,7 @@ async function testSupabaseConnection() {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('count(*)')
+      .select('*')
       .limit(1);
     
     if (error) {
@@ -99,6 +107,7 @@ async function testSupabaseConnection() {
       }
     } else {
       logSuccess('Database connection successful');
+      logSuccess(`Users table exists and is accessible`);
     }
   } catch (error) {
     logError(`Database connection failed: ${error.message}`);
@@ -108,18 +117,47 @@ async function testSupabaseConnection() {
   logHeader('Testing Storage Buckets');
   
   try {
+    // Try with regular client first
     const { data: buckets, error } = await supabase.storage.listBuckets();
     
     if (error) {
-      logError(`Failed to list storage buckets: ${error.message}`);
+      logWarning(`Regular client can't list buckets: ${error.message}`);
+      // Try with admin client
+      try {
+        const { data: adminBuckets, error: adminError } = await supabaseAdmin.storage.listBuckets();
+        if (adminError) {
+          logError(`Admin client also failed: ${adminError.message}`);
+        } else {
+          logSuccess('Admin client can access storage buckets');
+          if (adminBuckets && adminBuckets.length > 0) {
+            logSuccess(`Found ${adminBuckets.length} storage bucket(s):`);
+            adminBuckets.forEach(bucket => {
+              log(`  - ${bucket.name} (${bucket.public ? 'public' : 'private'})`, 'blue');
+            });
+          }
+        }
+      } catch (adminError) {
+        logError(`Admin storage test failed: ${adminError.message}`);
+      }
     } else {
       if (buckets && buckets.length > 0) {
         logSuccess(`Found ${buckets.length} storage bucket(s):`);
         buckets.forEach(bucket => {
           log(`  - ${bucket.name} (${bucket.public ? 'public' : 'private'})`, 'blue');
         });
+        
+        // Test specific buckets we expect
+        const expectedBuckets = ['user-uploads', 'portfolios'];
+        expectedBuckets.forEach(bucketName => {
+          const bucket = buckets.find(b => b.name === bucketName);
+          if (bucket) {
+            logSuccess(`✅ ${bucketName} bucket found`);
+          } else {
+            logWarning(`⚠️  ${bucketName} bucket missing`);
+          }
+        });
       } else {
-        logWarning('No storage buckets found. Create buckets in Supabase dashboard.');
+        logWarning('No storage buckets found. Run storage migration in Supabase dashboard.');
       }
     }
   } catch (error) {
