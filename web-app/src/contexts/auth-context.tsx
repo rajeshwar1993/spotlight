@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { User as SupabaseUser, Session, AuthError } from '@supabase/supabase-js';
+import { Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
 import type { User } from '@/types';
 
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {

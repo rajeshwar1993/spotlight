@@ -49,7 +49,7 @@ export function SignUpForm() {
           router.push(ROUTES.signin);
         }, 2000);
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: 'error',
         text: 'An unexpected error occurred. Please try again.',

@@ -15,7 +15,7 @@ export function ProtectedRoute({
   redirectTo = '/auth/signin', 
   requireEmailVerification = false 
 }: ProtectedRouteProps) {
-  const { user, loading, isAuthenticated, isEmailVerified } = useUser();
+  const { loading, isAuthenticated, isEmailVerified } = useUser();
   const router = useRouter();
 
   useEffect(() => {

@@ -43,7 +43,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Welcome back, {user?.full_name || 'User'}!</CardTitle>
             <CardDescription>
-              Here's your account information
+              Here&apos;s your account information
             </CardDescription>
           </CardHeader>
           <CardContent>

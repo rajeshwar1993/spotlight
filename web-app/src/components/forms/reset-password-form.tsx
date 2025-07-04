@@ -42,7 +42,7 @@ export function ResetPasswordForm() {
           text: 'Password reset email sent! Please check your inbox for instructions.',
         });
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: 'error',
         text: 'An unexpected error occurred. Please try again.',
@@ -57,7 +57,7 @@ export function ResetPasswordForm() {
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">Reset your password</CardTitle>
         <CardDescription>
-          Enter your email address and we'll send you a link to reset your password
+          Enter your email address and we&apos;ll send you a link to reset your password
         </CardDescription>
       </CardHeader>
       <CardContent>

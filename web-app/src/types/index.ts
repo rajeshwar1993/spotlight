@@ -1,9 +1,5 @@
 // Core type definitions for the Spotlight application
 import type { 
-  DatabaseUser, 
-  DatabasePortfolio, 
-  DatabaseImage, 
-  DatabaseAnnouncement,
   Profession as DbProfession,
   GenderType as DbGenderType,
   ImageType as DbImageType,

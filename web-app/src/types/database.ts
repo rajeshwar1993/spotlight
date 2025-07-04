@@ -43,7 +43,7 @@ export interface DatabasePortfolio {
   experience_years: number;
   height: string | null;
   weight: string | null;
-  measurements: Record<string, any> | null;
+  measurements: Record<string, unknown> | null;
   hair_color: string | null;
   eye_color: string | null;
   clothing_size: string | null;
