@@ -1,8 +1,8 @@
 // Hooks barrel exports
 
 // Authentication hooks
-// export { useAuth } from './use-auth';
-// export { useUser } from './use-user';
+export { useAuth } from './use-auth';
+export { useUser } from './use-user';
 
 // API hooks
 // export { usePortfolios } from './use-portfolios';
