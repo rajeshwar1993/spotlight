@@ -3,7 +3,15 @@
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
-import type { User } from '@/types';
+import type { User, UserProfileForm } from '@/types';
+import { 
+  updateUserProfile, 
+  uploadAvatar, 
+  deleteAvatar, 
+  getUserProfile,
+  type UserUpdateResponse,
+  type AvatarUploadResponse
+} from '@/lib/services/user';
 
 interface AuthContextType {
   user: User | null;
@@ -15,6 +23,11 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
   updatePassword: (password: string) => Promise<{ error: AuthError | null }>;
   resendConfirmation: (email: string) => Promise<{ error: AuthError | null }>;
+  // Profile management methods
+  updateProfile: (data: Partial<UserProfileForm>) => Promise<UserUpdateResponse>;
+  uploadUserAvatar: (file: File) => Promise<AvatarUploadResponse>;
+  deleteUserAvatar: () => Promise<{ error?: Error | null }>;
+  refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -224,6 +237,79 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Profile management methods
+  const updateProfile = async (profileData: Partial<UserProfileForm>): Promise<UserUpdateResponse> => {
+    if (!user?.id) {
+      return { error: new Error('User not authenticated') };
+    }
+
+    try {
+      const result = await updateUserProfile(user.id, profileData);
+      
+      if (result.data) {
+        // Update the user state with the new profile data
+        setUser(result.data);
+      }
+      
+      return result;
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const uploadUserAvatar = async (file: File): Promise<AvatarUploadResponse> => {
+    if (!user?.id) {
+      return { error: new Error('User not authenticated') };
+    }
+
+    try {
+      const result = await uploadAvatar(user.id, file);
+      
+      if (result.url) {
+        // Update the user state with the new avatar URL
+        setUser(prev => prev ? { ...prev, avatar_url: result.url } : null);
+      }
+      
+      return result;
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const deleteUserAvatar = async (): Promise<{ error?: Error | null }> => {
+    if (!user?.id) {
+      return { error: new Error('User not authenticated') };
+    }
+
+    try {
+      const result = await deleteAvatar(user.id);
+      
+      if (!result.error) {
+        // Update the user state to remove avatar URL
+        setUser(prev => prev ? { ...prev, avatar_url: null } : null);
+      }
+      
+      return result;
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const refreshUserProfile = async (): Promise<void> => {
+    if (!user?.id) {
+      return;
+    }
+
+    try {
+      const { data: refreshedUser } = await getUserProfile(user.id);
+      if (refreshedUser) {
+        setUser(refreshedUser);
+      }
+    } catch (error) {
+      console.error('Error refreshing user profile:', error);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     session,
@@ -234,6 +320,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     resetPassword,
     updatePassword,
     resendConfirmation,
+    updateProfile,
+    uploadUserAvatar,
+    deleteUserAvatar,
+    refreshUserProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
