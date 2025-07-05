@@ -429,13 +429,16 @@ export async function batchProcessImages(
   const results: File[] = [];
   
   for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    if (!file) continue;
+    
     try {
-      const processed = await processor(files[i]);
+      const processed = await processor(file);
       results.push(processed);
     } catch (error) {
-      console.error(`Failed to process image ${files[i].name}:`, error);
+      console.error(`Failed to process image ${file.name}:`, error);
       // Add original file as fallback
-      results.push(files[i]);
+      results.push(file);
     }
     
     if (onProgress) {
@@ -444,4 +447,178 @@ export async function batchProcessImages(
   }
   
   return results;
+}
+
+/**
+ * Create image from file for crop processing
+ */
+export function createImageFromFile(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Failed to load image for cropping'));
+    };
+    
+    img.src = url;
+  });
+}
+
+/**
+ * Apply crop to image canvas
+ */
+export function applyCropToCanvas(
+  image: HTMLImageElement,
+  cropData: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  },
+  targetWidth?: number,
+  targetHeight?: number
+): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  if (!ctx) {
+    throw new Error('Canvas context not available');
+  }
+
+  // Use target dimensions or crop dimensions
+  canvas.width = targetWidth || cropData.width;
+  canvas.height = targetHeight || cropData.height;
+
+  // Calculate scale factors
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+
+  // Draw cropped image
+  ctx.drawImage(
+    image,
+    cropData.x * scaleX,
+    cropData.y * scaleY,
+    cropData.width * scaleX,
+    cropData.height * scaleY,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  return canvas;
+}
+
+/**
+ * Convert canvas to file
+ */
+export function canvasToFile(
+  canvas: HTMLCanvasElement,
+  filename: string,
+  mimeType: string = 'image/jpeg',
+  quality: number = 0.9
+): Promise<File> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          const file = new File([blob], filename, {
+            type: mimeType,
+            lastModified: Date.now(),
+          });
+          resolve(file);
+        } else {
+          reject(new Error('Failed to convert canvas to file'));
+        }
+      },
+      mimeType,
+      quality
+    );
+  });
+}
+
+/**
+ * Get optimal crop for different aspect ratios
+ */
+export function getOptimalCrop(
+  imageWidth: number,
+  imageHeight: number,
+  targetAspectRatio: number
+): { x: number; y: number; width: number; height: number } {
+  const imageAspectRatio = imageWidth / imageHeight;
+  
+  let cropWidth: number;
+  let cropHeight: number;
+  let cropX: number;
+  let cropY: number;
+
+  if (imageAspectRatio > targetAspectRatio) {
+    // Image is wider than target, crop width
+    cropHeight = imageHeight;
+    cropWidth = imageHeight * targetAspectRatio;
+    cropX = (imageWidth - cropWidth) / 2;
+    cropY = 0;
+  } else {
+    // Image is taller than target, crop height
+    cropWidth = imageWidth;
+    cropHeight = imageWidth / targetAspectRatio;
+    cropX = 0;
+    cropY = (imageHeight - cropHeight) / 2;
+  }
+
+  return {
+    x: cropX,
+    y: cropY,
+    width: cropWidth,
+    height: cropHeight,
+  };
+}
+
+/**
+ * Auto-crop image to aspect ratio
+ */
+export async function autoCropToAspectRatio(
+  file: File,
+  aspectRatio: number,
+  quality: number = 0.9
+): Promise<File> {
+  const image = await createImageFromFile(file);
+  const cropData = getOptimalCrop(
+    image.naturalWidth,
+    image.naturalHeight,
+    aspectRatio
+  );
+  
+  const canvas = applyCropToCanvas(image, cropData);
+  return canvasToFile(canvas, file.name, file.type, quality);
+}
+
+/**
+ * Smart crop for profile images (focuses on center/face area)
+ */
+export async function smartCropProfile(
+  file: File,
+  size: number = 400
+): Promise<File> {
+  const image = await createImageFromFile(file);
+  const { naturalWidth: width, naturalHeight: height } = image;
+  
+  // Use smaller dimension as basis for square crop
+  const cropSize = Math.min(width, height);
+  const cropData = {
+    x: (width - cropSize) / 2,
+    y: Math.max(0, (height - cropSize) / 3), // Slightly higher to focus on face area
+    width: cropSize,
+    height: cropSize,
+  };
+  
+  const canvas = applyCropToCanvas(image, cropData, size, size);
+  return canvasToFile(canvas, file.name, file.type, 0.9);
 }

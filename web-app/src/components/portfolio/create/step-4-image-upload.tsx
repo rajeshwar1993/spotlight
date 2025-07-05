@@ -72,7 +72,7 @@ export function Step4ImageUpload() {
 
     try {
       const uploadPromises = files.map(file => 
-        uploadPortfolioImage(user.id, state.portfolioId, file, selectedImageType)
+        uploadPortfolioImage(user.id, state.portfolioId || null, file, selectedImageType)
       );
 
       const results = await Promise.all(uploadPromises);

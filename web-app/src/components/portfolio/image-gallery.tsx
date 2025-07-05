@@ -34,6 +34,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { PortfolioImage, ImageType } from '@/types';
 import { formatFileSize } from '@/lib/utils/image';
+import { ImagePreview } from './image-preview';
 
 interface ImageGalleryProps {
   images: PortfolioImage[];
@@ -74,6 +75,8 @@ export function ImageGallery({
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({ isOpen: false, image: null });
   const [draggedImage, setDraggedImage] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ alt_text: '', sort_order: 0 });
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(0);
 
   // Group images by type
   const imagesByType = images.reduce((acc, image) => {
@@ -155,7 +158,9 @@ export function ImageGallery({
 
     const newImages = [...images];
     const [draggedItem] = newImages.splice(draggedIndex, 1);
-    newImages.splice(targetIndex, 0, draggedItem);
+    if (draggedItem) {
+      newImages.splice(targetIndex, 0, draggedItem);
+    }
 
     const newOrder = newImages.map(img => img.id);
     onReorder(newOrder);
@@ -184,6 +189,29 @@ export function ImageGallery({
   const clearSelection = useCallback(() => {
     setSelectedImages([]);
   }, []);
+
+  const handleImageClick = useCallback((image: PortfolioImage) => {
+    const index = images.findIndex(img => img.id === image.id);
+    setPreviewIndex(index);
+    setPreviewOpen(true);
+  }, [images]);
+
+  const handlePreviewClose = useCallback(() => {
+    setPreviewOpen(false);
+  }, []);
+
+  const handlePreviewDelete = useCallback((image: PortfolioImage) => {
+    onDelete(image.id);
+    setPreviewOpen(false);
+  }, [onDelete]);
+
+  const handlePreviewSetPrimary = useCallback((image: PortfolioImage) => {
+    onSetPrimary(image.id, image.type);
+  }, [onSetPrimary]);
+
+  const handlePreviewUpdateAltText = useCallback((imageId: string, altText: string) => {
+    onUpdate(imageId, { alt_text: altText });
+  }, [onUpdate]);
 
   if (isLoading) {
     return (
@@ -301,7 +329,8 @@ export function ImageGallery({
                       <img
                         src={image.file_path}
                         alt={image.alt_text || image.file_name}
-                        className="w-full h-full object-cover rounded-t-lg"
+                        className="w-full h-full object-cover rounded-t-lg cursor-pointer"
+                        onClick={() => handleImageClick(image)}
                       />
                       
                       {/* Selection Checkbox */}
@@ -507,6 +536,19 @@ export function ImageGallery({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Image Preview */}
+      <ImagePreview
+        isOpen={previewOpen}
+        onClose={handlePreviewClose}
+        images={images}
+        initialIndex={previewIndex}
+        onDelete={canEdit ? handlePreviewDelete : undefined}
+        onEdit={canEdit ? handleEditImage : undefined}
+        onSetPrimary={canEdit ? handlePreviewSetPrimary : undefined}
+        onUpdateAltText={canEdit ? handlePreviewUpdateAltText : undefined}
+        canEdit={canEdit}
+      />
     </div>
   );
 }

@@ -34,7 +34,7 @@ export interface OptimizedImageUrls {
  */
 export function validateImageFile(file: File): ImageValidationResult {
   // Check file type
-  if (!APP_CONFIG.supportedImageTypes.includes(file.type)) {
+  if (!APP_CONFIG.supportedImageTypes.includes(file.type as 'image/jpeg' | 'image/png' | 'image/webp')) {
     return {
       isValid: false,
       error: `Unsupported file type. Please use: ${APP_CONFIG.supportedImageTypes.join(', ')}`
@@ -269,6 +269,8 @@ export async function uploadMultipleImages(
   // Upload files sequentially to avoid overwhelming the server
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
+    if (!file) continue;
+    
     const altText = altTexts?.[i];
     
     const result = await uploadPortfolioImage(userId, portfolioId, file, type, altText);

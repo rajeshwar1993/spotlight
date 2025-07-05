@@ -8,9 +8,10 @@ import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { ImageType } from '@/types';
 import { validateImageFile } from '@/lib/services/image';
-import { generateThumbnail } from '@/lib/utils/image';
+import { generateThumbnail, autoCropToAspectRatio, smartCropProfile } from '@/lib/utils/image';
 import { formatFileSize } from '@/lib/utils/image';
 import { IMAGE_LIMITS } from '@/lib/constants';
+import { ImageCropper } from './image-cropper';
 
 interface FileWithPreview extends File {
   preview?: string;
@@ -28,6 +29,9 @@ interface ImageUploadProps {
   className?: string;
   disabled?: boolean;
   acceptedFileTypes?: string[];
+  enableCropping?: boolean;
+  autoCrop?: boolean;
+  cropAspectRatio?: number | null;
 }
 
 export function ImageUpload({
@@ -39,10 +43,15 @@ export function ImageUpload({
   className,
   disabled = false,
   acceptedFileTypes = ['image/*'],
+  enableCropping = true,
+  autoCrop = false,
+  cropAspectRatio,
 }: ImageUploadProps) {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [currentCropFile, setCurrentCropFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getImageTypeLabel = (type: ImageType): string => {
@@ -75,8 +84,26 @@ export function ImageUpload({
     }
   };
 
+  const getDefaultAspectRatio = (type: ImageType): number | null => {
+    if (cropAspectRatio !== undefined) return cropAspectRatio;
+    
+    switch (type) {
+      case 'PROFILE':
+        return 1; // Square
+      case 'HERO':
+        return 16/9; // Video aspect ratio
+      case 'GALLERY':
+        return null; // Free aspect ratio
+      default:
+        return null;
+    }
+  };
+
+  const shouldAutoCrop = (type: ImageType): boolean => {
+    return autoCrop || type === 'PROFILE';
+  };
+
   const processFiles = useCallback(async (fileList: FileList | File[]) => {
-    const newFiles: FileWithPreview[] = [];
     const fileArray = Array.from(fileList);
 
     // Check if adding these files would exceed the limit
@@ -88,36 +115,62 @@ export function ImageUpload({
     for (const file of fileArray) {
       const validation = validateImageFile(file);
       
-      const fileWithPreview: FileWithPreview = {
-        ...file,
-        status: validation.isValid ? 'pending' : 'error',
-        error: validation.error,
-      };
+      if (!validation.isValid) {
+        const fileWithPreview: FileWithPreview = {
+          ...file,
+          status: 'error',
+          error: validation.error,
+        };
+        setFiles(prev => [...prev, fileWithPreview]);
+        continue;
+      }
 
-      // Generate preview and thumbnail for valid images
-      if (validation.isValid) {
+      // Handle auto-cropping for specific types
+      let processedFile = file;
+      if (shouldAutoCrop(imageType) && validation.isValid) {
         try {
-          fileWithPreview.preview = URL.createObjectURL(file);
-          fileWithPreview.thumbnail = await generateThumbnail(file, 150);
+          if (imageType === 'PROFILE') {
+            processedFile = await smartCropProfile(file, 400);
+          } else {
+            const aspectRatio = getDefaultAspectRatio(imageType);
+            if (aspectRatio) {
+              processedFile = await autoCropToAspectRatio(file, aspectRatio);
+            }
+          }
         } catch (error) {
-          console.error('Error generating preview:', error);
-          fileWithPreview.error = 'Failed to generate preview';
-          fileWithPreview.status = 'error';
+          console.error('Auto-crop failed, using original:', error);
         }
       }
 
-      newFiles.push(fileWithPreview);
+      const fileWithPreview: FileWithPreview = {
+        ...processedFile,
+        name: file.name, // Keep original name
+        status: 'pending',
+      };
+
+      // Generate preview and thumbnail
+      try {
+        fileWithPreview.preview = URL.createObjectURL(processedFile);
+        fileWithPreview.thumbnail = await generateThumbnail(processedFile, 150);
+      } catch (error) {
+        console.error('Error generating preview:', error);
+        fileWithPreview.error = 'Failed to generate preview';
+        fileWithPreview.status = 'error';
+      }
+
+      setFiles(prev => [...prev, fileWithPreview]);
+
+      // For manual cropping, open cropper for first valid file
+      if (enableCropping && !shouldAutoCrop(imageType) && !cropperOpen) {
+        setCurrentCropFile(file);
+        setCropperOpen(true);
+        return; // Process one file at a time when cropping
+      }
     }
 
-    const updatedFiles = [...files, ...newFiles];
-    setFiles(updatedFiles);
-    
-    // Call the callback with valid files only
-    const validFiles = newFiles.filter(f => f.status !== 'error');
-    if (validFiles.length > 0) {
-      onFilesSelected(validFiles);
-    }
-  }, [files, maxFiles, onFilesSelected]);
+    // Call the callback with valid files
+    onFilesSelected(files.filter(f => f.status !== 'error'));
+  }, [files, maxFiles, imageType, enableCropping, shouldAutoCrop, getDefaultAspectRatio, cropperOpen, onFilesSelected]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -221,6 +274,44 @@ export function ImageUpload({
     setUploadProgress(0);
     onFilesSelected([]);
   }, [files, onFilesSelected]);
+
+  const handleCropComplete = useCallback(async (croppedFile: File) => {
+    if (!currentCropFile) return;
+
+    const fileWithPreview: FileWithPreview = {
+      ...croppedFile,
+      name: currentCropFile.name, // Keep original name
+      status: 'pending',
+    };
+
+    try {
+      fileWithPreview.preview = URL.createObjectURL(croppedFile);
+      fileWithPreview.thumbnail = await generateThumbnail(croppedFile, 150);
+    } catch (error) {
+      console.error('Error generating preview:', error);
+      fileWithPreview.error = 'Failed to generate preview';
+      fileWithPreview.status = 'error';
+    }
+
+    setFiles(prev => [...prev, fileWithPreview]);
+    setCurrentCropFile(null);
+    setCropperOpen(false);
+
+    // Call the callback with the new file
+    onFilesSelected([...files.filter(f => f.status !== 'error'), fileWithPreview]);
+  }, [currentCropFile, files, onFilesSelected]);
+
+  const handleCropCancel = useCallback(() => {
+    setCurrentCropFile(null);
+    setCropperOpen(false);
+  }, []);
+
+  const openCropperForFile = useCallback((file: FileWithPreview) => {
+    // Create a new File object from the current file
+    const originalFile = new File([file], file.name, { type: file.type });
+    setCurrentCropFile(originalFile);
+    setCropperOpen(true);
+  }, []);
 
   const hasValidFiles = files.some(f => f.status === 'pending');
   const hasErrors = files.some(f => f.status === 'error');
@@ -336,6 +427,24 @@ export function ImageUpload({
                     >
                       <X className="w-3 h-3" />
                     </Button>
+
+                    {/* Crop Button */}
+                    {enableCropping && file.status === 'pending' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="absolute bottom-2 right-2 w-6 h-6 p-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openCropperForFile(file);
+                        }}
+                        title="Crop image"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l7-7m0 0l-4-4m4 4H7a2 2 0 00-2 2v10"/>
+                        </svg>
+                      </Button>
+                    )}
                   </div>
 
                   <div className="space-y-1">
@@ -385,6 +494,21 @@ export function ImageUpload({
             {isUploading ? 'Uploading...' : `Upload ${files.filter(f => f.status === 'pending').length} Image${files.filter(f => f.status === 'pending').length !== 1 ? 's' : ''}`}
           </Button>
         </div>
+      )}
+
+      {/* Image Cropper */}
+      {currentCropFile && (
+        <ImageCropper
+          isOpen={cropperOpen}
+          onClose={handleCropCancel}
+          file={currentCropFile}
+          onCropComplete={handleCropComplete}
+          aspectRatio={getDefaultAspectRatio(imageType)}
+          initialAspectRatio={
+            imageType === 'PROFILE' ? 'square' : 
+            imageType === 'HERO' ? 'video' : 'free'
+          }
+        />
       )}
     </div>
   );
