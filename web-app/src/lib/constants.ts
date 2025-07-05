@@ -69,3 +69,21 @@ export const IMAGE_TYPE_LABELS = {
   GALLERY: 'Gallery Image',
   INTERNAL: 'Internal Use',
 } as const;
+
+export const VALIDATION_UX = {
+  autoSaveDelay: 1000, // ms
+  exitConfirmationMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
+  characterWarningThreshold: 0.9, // 90% of limit
+  debounceDelay: 300, // ms for real-time validation
+  loadingStates: {
+    short: 500, // ms
+    medium: 1000, // ms
+    long: 2000, // ms
+  },
+  validation: {
+    showSuccessIcon: true,
+    showErrorIcon: true,
+    showWarningIcon: true,
+    showCharacterProgress: true,
+  },
+} as const;

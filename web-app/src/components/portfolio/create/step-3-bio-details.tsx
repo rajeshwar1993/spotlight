@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { ValidatedInput } from '@/components/forms/validated-input';
+import { ValidatedTextarea } from '@/components/forms/validated-textarea';
+import { FieldRequirement, useCharacterRequirements, FieldProgress } from '@/components/forms/field-requirement';
+import { ErrorMessage } from '@/components/forms/validation-message';
 import { useAuth } from '@/hooks/use-auth';
+import { useFormExitConfirmation } from '@/hooks/use-form-exit-confirmation';
 import { usePortfolioCreation } from './portfolio-creation-context';
 import { portfolioStep3Schema, type PortfolioStep3Form } from '@/lib/validations';
 import { createPortfolio, generateSlug } from '@/lib/services/portfolio';
 import { StepNavigation } from './step-navigation';
 import { AuthGuard } from './auth-guard';
-import { cn } from '@/lib/utils';
 import { FORM_LIMITS } from '@/lib/constants';
 
 export function Step3BioDetails() {
@@ -22,6 +23,7 @@ export function Step3BioDetails() {
   const { user } = useAuth();
   const { state, updateStep3, setErrors, clearErrors, canProceedToStep, setSubmitting, clearStorage } = usePortfolioCreation();
   const [isLoading, setIsLoading] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const form = useForm<PortfolioStep3Form>({
     resolver: zodResolver(portfolioStep3Schema),
@@ -29,7 +31,30 @@ export function Step3BioDetails() {
     mode: 'onChange',
   });
 
-  const { register, handleSubmit, watch, formState: { errors, isValid } } = form;
+  const { register, handleSubmit, watch, formState: { errors, isValid, isDirty } } = form;
+
+  // Form exit confirmation
+  useFormExitConfirmation({
+    hasUnsavedChanges: hasUnsavedChanges && isDirty,
+    onConfirm: () => setHasUnsavedChanges(false),
+  });
+
+  // Watch form values
+  const title = watch('title') || '';
+  const bio = watch('bio') || '';
+
+  // Character requirements
+  const titleRequirements = useCharacterRequirements(
+    title,
+    FORM_LIMITS.title.min,
+    FORM_LIMITS.title.max
+  );
+
+  const bioRequirements = useCharacterRequirements(
+    bio,
+    FORM_LIMITS.bio.min,
+    FORM_LIMITS.bio.max
+  );
 
   // Check if user can access this step
   useEffect(() => {
@@ -43,6 +68,7 @@ export function Step3BioDetails() {
     const subscription = watch((value) => {
       updateStep3(value as PortfolioStep3Form);
       clearErrors();
+      setHasUnsavedChanges(true);
     });
     return () => subscription.unsubscribe();
   }, [watch, updateStep3, clearErrors]);
@@ -56,8 +82,6 @@ export function Step3BioDetails() {
     }
   }, [state.formData.step1, state.formData.step3.title, updateStep3, form]);
 
-  const titleLength = watch('title')?.length || 0;
-  const bioLength = watch('bio')?.length || 0;
 
   const onSubmit = async (data: PortfolioStep3Form) => {
     if (!user) {
@@ -92,8 +116,9 @@ export function Step3BioDetails() {
         throw new Error(error?.message || 'Failed to create portfolio');
       }
 
-      // Clear form data from storage
+      // Clear form data from storage and unsaved changes
       clearStorage();
+      setHasUnsavedChanges(false);
 
       // Redirect to success page with portfolio ID
       router.push(`/create/success?portfolio=${portfolio.id}`);
@@ -136,76 +161,89 @@ export function Step3BioDetails() {
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Portfolio Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-medium">
-                Portfolio Title *
-              </Label>
-              <Input
+            <div className="space-y-3">
+              <ValidatedInput
                 id="title"
+                label="Portfolio Title"
+                isRequired={true}
                 {...register('title')}
                 placeholder="e.g., John Smith - Actor & Model"
-                className={errors.title ? 'border-red-500' : ''}
-                maxLength={FORM_LIMITS.title.max}
+                error={errors.title?.message}
+                isValid={!errors.title && title.length >= FORM_LIMITS.title.min}
+                characterLimit={FORM_LIMITS.title.max}
+                characterCount={title.length}
+                helperText="This will be the main headline for your portfolio"
               />
-              <div className="flex justify-between items-center">
-                {errors.title && (
-                  <p className="text-sm text-red-600">{errors.title.message}</p>
-                )}
-                <p className={cn(
-                  'text-sm ml-auto',
-                  titleLength > FORM_LIMITS.title.max * 0.9 ? 'text-red-600' : 'text-gray-500'
-                )}>
-                  {titleLength}/{FORM_LIMITS.title.max}
-                </p>
-              </div>
-              <p className="text-sm text-gray-500">
-                This will be the main headline for your portfolio
-              </p>
+              
+              {title.length > 0 && (
+                <div className="flex gap-4">
+                  <FieldRequirement 
+                    requirements={titleRequirements}
+                    compact={true}
+                    className="flex-1"
+                  />
+                  <FieldProgress
+                    current={title.length}
+                    target={FORM_LIMITS.title.min}
+                    label="Minimum length"
+                    className="flex-1"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Bio */}
-            <div className="space-y-2">
-              <Label htmlFor="bio" className="text-sm font-medium">
-                Professional Bio *
-              </Label>
-              <Textarea
+            <div className="space-y-3">
+              <ValidatedTextarea
                 id="bio"
+                label="Professional Bio"
+                isRequired={true}
                 {...register('bio')}
                 placeholder="Tell your story... Share your experience, training, achievements, and what makes you unique as a professional. This bio will help casting directors and clients understand your background and capabilities."
-                className={cn(
-                  'min-h-[200px] resize-none',
-                  errors.bio ? 'border-red-500' : ''
-                )}
-                maxLength={FORM_LIMITS.bio.max}
+                className="min-h-[200px]"
+                error={errors.bio?.message}
+                isValid={!errors.bio && bio.length >= FORM_LIMITS.bio.min}
+                characterLimit={FORM_LIMITS.bio.max}
+                characterMinimum={FORM_LIMITS.bio.min}
+                characterCount={bio.length}
+                showCharacterProgress={true}
               />
-              <div className="flex justify-between items-center">
-                {errors.bio && (
-                  <p className="text-sm text-red-600">{errors.bio.message}</p>
-                )}
-                <p className={cn(
-                  'text-sm ml-auto',
-                  bioLength > FORM_LIMITS.bio.max * 0.9 ? 'text-red-600' : 
-                  bioLength < FORM_LIMITS.bio.min ? 'text-orange-600' : 'text-gray-500'
-                )}>
-                  {bioLength}/{FORM_LIMITS.bio.max}
-                </p>
-              </div>
-              <div className="text-sm text-gray-500 space-y-1">
-                <p>Include details about:</p>
-                <ul className="list-disc list-inside ml-4 space-y-1">
-                  <li>Your experience and training</li>
-                  <li>Notable projects or achievements</li>
-                  <li>Your unique skills and strengths</li>
-                  <li>What you&apos;re passionate about in your work</li>
-                </ul>
-              </div>
+              
+              {bio.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex gap-4">
+                    <FieldRequirement 
+                      requirements={bioRequirements}
+                      compact={true}
+                      className="flex-1"
+                    />
+                    <FieldProgress
+                      current={bio.length}
+                      target={FORM_LIMITS.bio.min}
+                      label="Minimum length"
+                      className="flex-1"
+                    />
+                  </div>
+                  
+                  <div className="text-sm text-gray-500 space-y-1">
+                    <p>Include details about:</p>
+                    <ul className="list-disc list-inside ml-4 space-y-1">
+                      <li>Your experience and training</li>
+                      <li>Notable projects or achievements</li>
+                      <li>Your unique skills and strengths</li>
+                      <li>What you&apos;re passionate about in your work</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Error Display */}
             {state.errors.submit && (
-              <div className="p-4 border border-red-200 bg-red-50 rounded-md">
-                <p className="text-sm text-red-600">{state.errors.submit}</p>
-              </div>
+              <ErrorMessage 
+                message={state.errors.submit}
+                size="md"
+              />
             )}
 
             {/* Preview Section */}

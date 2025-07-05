@@ -33,6 +33,7 @@ interface PortfolioCreationState {
   isComplete: boolean;
   errors: Record<string, string>;
   isSubmitting: boolean;
+  hasUnsavedChanges: boolean;
 }
 
 // Actions
@@ -44,6 +45,7 @@ type PortfolioCreationAction =
   | { type: 'SET_ERRORS'; payload: Record<string, string> }
   | { type: 'CLEAR_ERRORS' }
   | { type: 'SET_SUBMITTING'; payload: boolean }
+  | { type: 'SET_UNSAVED_CHANGES'; payload: boolean }
   | { type: 'RESET_FORM' }
   | { type: 'LOAD_FROM_STORAGE'; payload: PortfolioFormData };
 
@@ -70,6 +72,7 @@ const initialState: PortfolioCreationState = {
   isComplete: false,
   errors: {},
   isSubmitting: false,
+  hasUnsavedChanges: false,
 };
 
 // Reducer
@@ -92,6 +95,7 @@ function portfolioCreationReducer(
           ...state.formData,
           step1: { ...state.formData.step1, ...action.payload },
         },
+        hasUnsavedChanges: true,
       };
 
     case 'UPDATE_STEP2':
@@ -101,6 +105,7 @@ function portfolioCreationReducer(
           ...state.formData,
           step2: { ...state.formData.step2, ...action.payload },
         },
+        hasUnsavedChanges: true,
       };
 
     case 'UPDATE_STEP3':
@@ -110,6 +115,7 @@ function portfolioCreationReducer(
           ...state.formData,
           step3: { ...state.formData.step3, ...action.payload },
         },
+        hasUnsavedChanges: true,
       };
 
     case 'SET_ERRORS':
@@ -130,10 +136,17 @@ function portfolioCreationReducer(
         isSubmitting: action.payload,
       };
 
+    case 'SET_UNSAVED_CHANGES':
+      return {
+        ...state,
+        hasUnsavedChanges: action.payload,
+      };
+
     case 'RESET_FORM':
       return {
         ...initialState,
         formData: initialFormData,
+        hasUnsavedChanges: false,
       };
 
     case 'LOAD_FROM_STORAGE':
@@ -158,6 +171,7 @@ interface PortfolioCreationContextType {
   setErrors: (errors: Record<string, string>) => void;
   clearErrors: () => void;
   setSubmitting: (submitting: boolean) => void;
+  setUnsavedChanges: (hasChanges: boolean) => void;
   resetForm: () => void;
   saveToStorage: () => void;
   loadFromStorage: () => void;
@@ -204,6 +218,10 @@ export function PortfolioCreationProvider({ children }: { children: React.ReactN
 
   const setSubmitting = (submitting: boolean) => {
     dispatch({ type: 'SET_SUBMITTING', payload: submitting });
+  };
+
+  const setUnsavedChanges = (hasChanges: boolean) => {
+    dispatch({ type: 'SET_UNSAVED_CHANGES', payload: hasChanges });
   };
 
   const resetForm = () => {
@@ -301,6 +319,7 @@ export function PortfolioCreationProvider({ children }: { children: React.ReactN
     setErrors,
     clearErrors,
     setSubmitting,
+    setUnsavedChanges,
     resetForm,
     saveToStorage,
     loadFromStorage,

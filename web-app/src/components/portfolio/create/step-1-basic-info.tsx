@@ -5,13 +5,16 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ValidatedInput } from '@/components/forms/validated-input';
+import { FieldRequirement, useCharacterRequirements } from '@/components/forms/field-requirement';
 import { useAuth } from '@/hooks/use-auth';
+import { useFormExitConfirmation } from '@/hooks/use-form-exit-confirmation';
 import { usePortfolioCreation } from './portfolio-creation-context';
 import { portfolioStep1Schema, type PortfolioStep1Form } from '@/lib/validations';
 import { Profession } from '@/types';
+import { FORM_LIMITS } from '@/lib/constants';
 import { StepNavigation } from './step-navigation';
 
 export function Step1BasicInfo() {
@@ -19,6 +22,7 @@ export function Step1BasicInfo() {
   const { user } = useAuth();
   const { state, updateStep1, setStep, setErrors, clearErrors } = usePortfolioCreation();
   const [isLoading, setIsLoading] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const form = useForm<PortfolioStep1Form>({
     resolver: zodResolver(portfolioStep1Schema),
@@ -26,7 +30,31 @@ export function Step1BasicInfo() {
     mode: 'onChange',
   });
 
-  const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = form;
+  const { register, handleSubmit, watch, setValue, formState: { errors, isValid, isDirty } } = form;
+
+  // Form exit confirmation
+  useFormExitConfirmation({
+    hasUnsavedChanges: hasUnsavedChanges && isDirty,
+    onConfirm: () => setHasUnsavedChanges(false),
+  });
+
+  // Watch all form values
+  const fullName = watch('full_name') || '';
+  const email = watch('email') || '';
+  const location = watch('location') || '';
+
+  // Character requirements for form fields
+  const fullNameRequirements = useCharacterRequirements(
+    fullName, 
+    FORM_LIMITS.fullName.min, 
+    FORM_LIMITS.fullName.max
+  );
+
+  const locationRequirements = useCharacterRequirements(
+    location, 
+    undefined, 
+    FORM_LIMITS.location.max
+  );
 
   // Auto-populate from user data if logged in
   useEffect(() => {
@@ -64,6 +92,7 @@ export function Step1BasicInfo() {
     const subscription = watch((value) => {
       updateStep1(value as PortfolioStep1Form);
       clearErrors();
+      setHasUnsavedChanges(true);
     });
     return () => subscription.unsubscribe();
   }, [watch, updateStep1, clearErrors]);
@@ -76,6 +105,9 @@ export function Step1BasicInfo() {
       // Validate the data
       const validatedData = portfolioStep1Schema.parse(data);
       updateStep1(validatedData);
+      
+      // Clear unsaved changes flag
+      setHasUnsavedChanges(false);
       
       // Move to next step
       setStep(2);
@@ -115,42 +147,42 @@ export function Step1BasicInfo() {
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Full Name */}
-            <div className="space-y-2">
-              <Label htmlFor="full_name" className="text-sm font-medium">
-                Full Name *
-              </Label>
-              <Input
+            <div className="space-y-3">
+              <ValidatedInput
                 id="full_name"
+                label="Full Name"
+                isRequired={true}
                 {...register('full_name')}
                 placeholder="Enter your full name"
-                className={errors.full_name ? 'border-red-500' : ''}
+                error={errors.full_name?.message}
+                isValid={!errors.full_name && fullName.length >= FORM_LIMITS.fullName.min}
+                characterLimit={FORM_LIMITS.fullName.max}
+                characterCount={fullName.length}
+                helperText="This will be displayed prominently on your portfolio"
               />
-              {errors.full_name && (
-                <p className="text-sm text-red-600">{errors.full_name.message}</p>
+              
+              {fullName.length > 0 && (
+                <FieldRequirement 
+                  requirements={fullNameRequirements}
+                  compact={true}
+                />
               )}
             </div>
 
             {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
-                Email Address *
-              </Label>
-              <Input
+            <div className="space-y-3">
+              <ValidatedInput
                 id="email"
                 type="email"
+                label="Email Address"
+                isRequired={true}
                 {...register('email')}
                 placeholder="Enter your email address"
-                className={errors.email ? 'border-red-500' : ''}
+                error={errors.email?.message}
+                isValid={!errors.email && email.includes('@')}
                 disabled={!!user?.email}
+                helperText={user?.email ? "Using your account email address" : "We'll use this to contact you about your portfolio"}
               />
-              {errors.email && (
-                <p className="text-sm text-red-600">{errors.email.message}</p>
-              )}
-              {user?.email && (
-                <p className="text-sm text-gray-500">
-                  Using your account email address
-                </p>
-              )}
             </div>
 
             {/* Profession */}
@@ -177,22 +209,26 @@ export function Step1BasicInfo() {
             </div>
 
             {/* Location */}
-            <div className="space-y-2">
-              <Label htmlFor="location" className="text-sm font-medium">
-                Location
-              </Label>
-              <Input
+            <div className="space-y-3">
+              <ValidatedInput
                 id="location"
+                label="Location"
+                isRequired={false}
                 {...register('location')}
                 placeholder="City, State/Country (optional)"
-                className={errors.location ? 'border-red-500' : ''}
+                error={errors.location?.message}
+                isValid={!errors.location}
+                characterLimit={FORM_LIMITS.location.max}
+                characterCount={location.length}
+                helperText="This helps casting directors and clients find you"
               />
-              {errors.location && (
-                <p className="text-sm text-red-600">{errors.location.message}</p>
+              
+              {location.length > 0 && (
+                <FieldRequirement 
+                  requirements={locationRequirements}
+                  compact={true}
+                />
               )}
-              <p className="text-sm text-gray-500">
-                This helps casting directors and clients find you
-              </p>
             </div>
 
             {/* Error Display */}
