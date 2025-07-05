@@ -4,19 +4,22 @@
 -- First, create the new enum with updated values
 CREATE TYPE image_type_new AS ENUM ('PROFILE', 'HERO', 'GALLERY', 'INTERNAL');
 
--- Update existing records to map old values to new values
-UPDATE public.images SET type = 
+-- Add a temporary column with the new enum type
+ALTER TABLE public.images ADD COLUMN type_new image_type_new;
+
+-- Update the new column based on the old values
+UPDATE public.images SET type_new = 
   CASE 
     WHEN type = 'HEADSHOT' THEN 'PROFILE'::image_type_new
     WHEN type = 'BODY_SHOT' THEN 'GALLERY'::image_type_new
     WHEN type = 'PORTFOLIO' THEN 'GALLERY'::image_type_new
     WHEN type = 'PROFILE' THEN 'PROFILE'::image_type_new
     ELSE 'GALLERY'::image_type_new -- Default fallback
-  END::text::image_type_new;
+  END;
 
--- Drop the constraint on the images table
-ALTER TABLE public.images ALTER COLUMN type DROP DEFAULT;
-ALTER TABLE public.images ALTER COLUMN type TYPE image_type_new USING type::text::image_type_new;
+-- Drop the old column and rename the new one
+ALTER TABLE public.images DROP COLUMN type;
+ALTER TABLE public.images RENAME COLUMN type_new TO type;
 
 -- Drop the old enum and rename the new one
 DROP TYPE image_type;

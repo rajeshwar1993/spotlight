@@ -362,15 +362,14 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create policy to enforce publishing requirements
 CREATE POLICY "portfolios_publish_requirements" ON public.portfolios
-    FOR UPDATE USING (
+    FOR UPDATE USING (auth.uid() = user_id)
+    WITH CHECK (
         auth.uid() = user_id AND
         (
-            -- Allow unpublishing without restrictions
-            (OLD.is_published = true AND NEW.is_published = false) OR
+            -- Allow if not publishing (is_published = false)
+            is_published = false OR
             -- Allow publishing only if requirements are met
-            (OLD.is_published = false AND NEW.is_published = true AND public.can_publish_portfolio(auth.uid())) OR
-            -- Allow other updates if not changing publish status
-            (OLD.is_published = NEW.is_published)
+            (is_published = true AND public.can_publish_portfolio(auth.uid()))
         )
     );
 
