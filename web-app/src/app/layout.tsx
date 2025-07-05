@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Playfair_Display, Fira_Code } from 'next/font/google';
 import { AuthProvider } from '@/contexts/auth-context';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { MainLayout } from '@/components/layout';
 import './globals.css';
 
 const inter = Inter({
@@ -41,7 +42,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
+            <MainLayout>
+              {children}
+            </MainLayout>
           </AuthProvider>
         </ThemeProvider>
       </body>

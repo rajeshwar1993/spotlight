@@ -40,7 +40,5 @@ export * from './auth/protected-route';
 // Providers
 export * from './providers/theme-provider';
 
-// Layout Components (to be created in Part 2.2)
-// export * from './layout/navbar';
-// export * from './layout/footer';
-// export * from './layout/announcement-banner';
+// Layout Components
+export * from './layout';

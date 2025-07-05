@@ -18,6 +18,10 @@ export const ROUTES = {
   createPortfolio: '/create',
   portfolio: (slug: string) => `/mypage/${slug}`,
   preview: (id: string) => `/preview/${id}`,
+  // Additional routes for navigation
+  examples: '/examples',
+  templates: '/templates',
+  pricing: '/pricing',
 } as const;
 
 export const FORM_LIMITS = {
