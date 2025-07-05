@@ -54,7 +54,7 @@ export interface User {
   email: string;
   full_name?: string | null;
   avatar_url?: string | null;
-  profession: Profession;
+  profession?: Profession | null;
   gender?: Gender | null;
   date_of_birth?: string | null;
   location?: string | null;
