@@ -1,7 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
-import { createClient } from '@/lib/supabase/server';
 import type { User, UserProfileForm } from '@/types';
-import type { FileUploadForm } from '@/lib/validations';
 
 export interface UserProfileResponse {
   data?: User;
@@ -97,7 +95,7 @@ export async function updateUserProfile(
 
     // Remove undefined values
     const cleanedData = Object.fromEntries(
-      Object.entries(updateData).filter(([_, value]) => value !== undefined)
+      Object.entries(updateData).filter(([, value]) => value !== undefined)
     );
 
     const { data: updatedUser, error } = await supabase
@@ -159,7 +157,7 @@ export async function updateUserProfile(
 /**
  * Calculate profile completion percentage
  */
-export function calculateProfileCompletion(user: any): number {
+export function calculateProfileCompletion(user: Record<string, unknown>): number {
   const fields = [
     'full_name',
     'profession',
@@ -203,7 +201,7 @@ export async function uploadAvatar(userId: string, file: File): Promise<AvatarUp
     await deleteAvatar(userId);
 
     // Upload new avatar
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('user-uploads')
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -329,56 +327,3 @@ export function getProfileCompletionDetails(user: User) {
   };
 }
 
-/**
- * Server-side user profile operations
- */
-export async function getUserProfileServer(userId: string): Promise<UserProfileResponse> {
-  try {
-    const supabaseServer = await createClient();
-    
-    const { data: userProfile, error } = await supabaseServer
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching user profile (server):', error);
-      return { error: new Error(error.message) };
-    }
-
-    if (!userProfile) {
-      return { error: new Error('User not found') };
-    }
-
-    // Transform database user to application user type
-    const transformedUser: User = {
-      id: userProfile.id,
-      email: userProfile.email,
-      full_name: userProfile.full_name,
-      avatar_url: userProfile.avatar_url,
-      profession: userProfile.profession,
-      gender: userProfile.gender,
-      date_of_birth: userProfile.date_of_birth,
-      location: userProfile.location,
-      bio: userProfile.bio,
-      phone: userProfile.phone,
-      website_url: userProfile.website_url,
-      social_links: {
-        instagram: userProfile.social_instagram,
-        twitter: userProfile.social_twitter,
-        tiktok: userProfile.social_tiktok,
-        linkedin: userProfile.social_linkedin,
-      },
-      is_email_verified: userProfile.is_email_verified,
-      is_profile_complete: userProfile.is_profile_complete,
-      created_at: userProfile.created_at,
-      updated_at: userProfile.updated_at,
-    };
-
-    return { data: transformedUser };
-  } catch (error) {
-    console.error('Error in getUserProfileServer:', error);
-    return { error: error as Error };
-  }
-}
