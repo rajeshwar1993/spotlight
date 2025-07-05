@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTemplateConfig, getTemplatesByCategory } from '@/lib/templates/registry';
+import { getTemplateConfig, getTemplatesByCategory } from '@/lib/templates/registry-simple';
 import { TEMPLATE_CATEGORIES } from '@/lib/templates/config';
 import { TemplatePreview, TemplateComparison } from './template-preview';
 

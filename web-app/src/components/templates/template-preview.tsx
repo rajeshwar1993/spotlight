@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TemplateRenderer } from './template-renderer';
-import { getTemplateConfig, getTemplatePreviewData } from '@/lib/templates/registry';
+import { getTemplateConfig, getTemplatePreview } from '@/lib/templates/registry-simple';
 import { getSamplePortfolioData } from '@/lib/templates/preview-data';
 
 interface TemplatePreviewProps {
@@ -32,7 +32,7 @@ export function TemplatePreview({
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const templateConfig = useMemo(() => getTemplateConfig(templateType), [templateType]);
-  const previewData = useMemo(() => getTemplatePreviewData(templateType), [templateType]);
+  const previewData = useMemo(() => getTemplatePreview(templateType), [templateType]);
   const sampleData = useMemo(() => getSamplePortfolioData(templateType), [templateType]);
 
   if (!templateConfig || !previewData || !sampleData) {
@@ -190,7 +190,7 @@ export function TemplatePreview({
           <div className="p-4 border-t border-gray-200 bg-gray-50">
             <h4 className="text-sm font-semibold text-gray-900 mb-2">Template Features:</h4>
             <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-              {previewData.interactive_features.map((feature, index) => (
+              {previewData.interactive_features.map((feature: string, index: number) => (
                 <div key={index} className="flex items-center">
                   <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2" />
                   {feature}

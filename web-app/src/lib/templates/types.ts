@@ -1,5 +1,8 @@
 import { TemplateType, Portfolio, User, PortfolioImage } from '@/types';
 
+// Export TemplateType for use in this module
+export type { TemplateType };
+
 // Enhanced template configuration interfaces
 export interface TemplateFeature {
   id: string;

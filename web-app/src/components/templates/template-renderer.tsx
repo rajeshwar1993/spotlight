@@ -3,7 +3,7 @@
 import React, { Suspense, useMemo } from 'react';
 import { TemplateType } from '@/types';
 import type { TemplateProps, PortfolioData } from '@/lib/templates/types';
-import { getTemplateComponent, getTemplateConfig, validateTemplateData } from '@/lib/templates/registry';
+import { getTemplateComponent, getTemplateConfig, validateTemplateData } from '@/lib/templates/registry-simple';
 import { TemplateWrapper } from './template-wrapper';
 import { TemplateLoadingSkeleton } from './template-loading';
 import { TemplateErrorBoundary } from './template-error-boundary';

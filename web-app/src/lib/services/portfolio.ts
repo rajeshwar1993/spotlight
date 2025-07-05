@@ -107,9 +107,22 @@ export async function getPortfolioBySlug(slug: string): Promise<PortfolioRespons
 /**
  * Create new portfolio
  */
+interface CreatePortfolioData {
+  title?: string;
+  slug?: string;
+  bio?: string;
+  template_type?: TemplateType;
+  is_published?: boolean;
+  height?: string;
+  weight?: string;
+  eye_color?: string;
+  hair_color?: string;
+  skills?: string[];
+}
+
 export async function createPortfolio(
   userId: string, 
-  portfolioData: Partial<Portfolio>
+  portfolioData: CreatePortfolioData
 ): Promise<PortfolioResponse> {
   try {
     const { data: portfolio, error } = await supabase
@@ -119,7 +132,7 @@ export async function createPortfolio(
         title: portfolioData.title,
         slug: portfolioData.slug,
         bio: portfolioData.bio,
-        template_type: portfolioData.template_type,
+        template: portfolioData.template_type,
         is_published: portfolioData.is_published || false,
         height: portfolioData.height,
         weight: portfolioData.weight,
@@ -149,14 +162,14 @@ export async function createPortfolio(
  */
 export async function updatePortfolio(
   portfolioId: string, 
-  portfolioData: Partial<Portfolio>
+  portfolioData: CreatePortfolioData
 ): Promise<PortfolioResponse> {
   try {
     const updateData = {
       title: portfolioData.title,
       slug: portfolioData.slug,
       bio: portfolioData.bio,
-      template_type: portfolioData.template_type,
+      template: portfolioData.template_type,
       is_published: portfolioData.is_published,
       height: portfolioData.height,
       weight: portfolioData.weight,
@@ -283,14 +296,14 @@ export async function uploadPortfolioImage(
     if (imageType === 'gallery') {
       const { data: existingImages } = await supabase
         .from('portfolio_images')
-        .select('order_index')
+        .select('sort_order')
         .eq('portfolio_id', portfolioId)
-        .eq('image_type', 'gallery')
-        .order('order_index', { ascending: false })
+        .eq('type', 'gallery')
+        .order('sort_order', { ascending: false })
         .limit(1);
 
-      if (existingImages && existingImages.length > 0) {
-        orderIndex = (existingImages[0].order_index || 0) + 1;
+      if (existingImages && existingImages.length > 0 && existingImages[0]) {
+        orderIndex = (existingImages[0].sort_order || 0) + 1;
       }
     }
 
@@ -299,11 +312,12 @@ export async function uploadPortfolioImage(
       .from('portfolio_images')
       .insert({
         portfolio_id: portfolioId,
-        image_type: imageType,
+        type: imageType,
         file_path: imageUrl,
         file_name: fileName,
         alt_text: altText,
-        order_index: orderIndex,
+        sort_order: orderIndex,
+        is_primary: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
@@ -394,33 +408,44 @@ export async function getPortfolioData(portfolioId: string): Promise<PortfolioDa
 
     // Transform images by type
     const imagesByType = {
-      profile: images?.find(img => img.image_type === 'profile') || null,
-      hero: images?.find(img => img.image_type === 'hero') || null,
-      gallery: images?.filter(img => img.image_type === 'gallery') || []
+      profile: images?.find(img => img.type === 'PROFILE') || undefined,
+      hero: images?.find(img => img.type === 'HERO') || undefined,
+      gallery: images?.filter(img => img.type === 'GALLERY') || []
     };
 
     // Build portfolio data
     const portfolioData: PortfolioData = {
       user: {
         id: user.id,
+        email: user.email,
         full_name: user.full_name,
         profession: user.profession,
         location: user.location,
         bio: user.bio,
-        avatar_url: user.avatar_url
+        avatar_url: user.avatar_url,
+        is_email_verified: user.is_email_verified,
+        is_profile_complete: user.is_profile_complete,
+        created_at: user.created_at,
+        updated_at: user.updated_at
       },
       portfolio: {
         id: portfolio.id,
+        user_id: portfolio.user_id,
         title: portfolio.title,
         slug: portfolio.slug,
         bio: portfolio.bio,
-        template_type: portfolio.template_type,
+        template: portfolio.template,
+        status: portfolio.is_published ? 'published' : 'draft',
         is_published: portfolio.is_published,
         height: portfolio.height,
         weight: portfolio.weight,
         eye_color: portfolio.eye_color,
         hair_color: portfolio.hair_color,
-        skills: portfolio.skills
+        skills: portfolio.skills,
+        experience_years: portfolio.experience_years || 0,
+        view_count: portfolio.view_count || 0,
+        created_at: portfolio.created_at,
+        updated_at: portfolio.updated_at
       },
       images: imagesByType,
       social_links: {
@@ -433,12 +458,12 @@ export async function getPortfolioData(portfolioId: string): Promise<PortfolioDa
       contact_info: {
         email: user.email,
         phone: user.phone,
-        agent: null // TODO: Add agent support
+        agent: undefined // TODO: Add agent support
       },
       stats: {
         experience_years: calculateExperienceYears(user.date_of_birth),
         projects_completed: imagesByType.gallery.length,
-        portfolio_views: 0 // TODO: Add analytics
+        view_count: 0 // TODO: Add analytics
       }
     };
 

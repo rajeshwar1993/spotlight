@@ -1,6 +1,6 @@
 import type { TemplateType, TemplateProps, PortfolioData } from './types';
 import { TEMPLATE_CONFIGS, TEMPLATE_VALIDATIONS } from './config';
-import { getTemplateConfig, validateTemplateData } from './registry';
+import { getTemplateConfig, validateTemplateData } from './registry-simple';
 
 /**
  * Template utility functions for the Spotlight portfolio system
@@ -55,7 +55,7 @@ export function validatePortfolioData(data: PortfolioData, templateType: Templat
   // Template-specific validation
   const templateConfig = getTemplateConfig(templateType);
   if (templateConfig) {
-    const templateValidation = validateTemplateData(data, templateType);
+    const templateValidation = validateTemplateData(templateType, data);
     if (!templateValidation.isValid) {
       errors.push(...templateValidation.errors);
     }
@@ -317,8 +317,8 @@ export function formatTemplateDataForExport(data: PortfolioData, templateType: T
  */
 export function sanitizeTemplateData(data: PortfolioData): PortfolioData {
   // Remove potentially dangerous content
-  const sanitizeString = (str: string | null | undefined): string | null => {
-    if (!str) return null;
+  const sanitizeString = (str: string | null | undefined): string | undefined => {
+    if (!str) return undefined;
     
     // Remove script tags and dangerous HTML
     return str
@@ -333,20 +333,20 @@ export function sanitizeTemplateData(data: PortfolioData): PortfolioData {
     ...data,
     user: {
       ...data.user,
-      full_name: sanitizeString(data.user?.full_name) || '',
-      bio: sanitizeString(data.user?.bio),
-      location: sanitizeString(data.user?.location)
+      full_name: sanitizeString(data.user?.full_name) || data.user?.full_name || '',
+      bio: sanitizeString(data.user?.bio) || data.user?.bio,
+      location: sanitizeString(data.user?.location) || data.user?.location
     },
     portfolio: {
       ...data.portfolio,
-      title: sanitizeString(data.portfolio?.title),
-      bio: sanitizeString(data.portfolio?.bio),
-      skills: data.portfolio?.skills?.map(skill => sanitizeString(skill)).filter(Boolean) as string[]
+      title: sanitizeString(data.portfolio?.title) || data.portfolio?.title,
+      bio: sanitizeString(data.portfolio?.bio) || data.portfolio?.bio,
+      skills: data.portfolio?.skills?.map(skill => sanitizeString(skill) || skill).filter(Boolean) as string[]
     },
     contact_info: {
       ...data.contact_info,
-      email: sanitizeString(data.contact_info?.email),
-      phone: sanitizeString(data.contact_info?.phone)
+      email: sanitizeString(data.contact_info?.email) || data.contact_info?.email,
+      phone: sanitizeString(data.contact_info?.phone) || data.contact_info?.phone
     }
   };
 }
@@ -360,7 +360,12 @@ export function getTemplatePerformanceMetrics(templateType: TemplateType): {
   mobileOptimized: boolean;
   accessibilityScore: number;
 } {
-  const metrics = {
+  const metrics: Record<TemplateType, {
+    complexity: 'low' | 'medium' | 'high';
+    loadTime: 'fast' | 'medium' | 'slow';
+    mobileOptimized: boolean;
+    accessibilityScore: number;
+  }> = {
     T1: { complexity: 'low', loadTime: 'fast', mobileOptimized: true, accessibilityScore: 95 },
     T2: { complexity: 'medium', loadTime: 'medium', mobileOptimized: true, accessibilityScore: 90 },
     T3: { complexity: 'low', loadTime: 'fast', mobileOptimized: true, accessibilityScore: 98 },

@@ -32,20 +32,16 @@ export {
 } from '@/lib/templates/config';
 
 export {
-  TEMPLATE_REGISTRY,
   getTemplateConfig,
   getTemplateComponent,
-  getTemplateSections,
-  getTemplateValidation,
   getTemplatePreview,
   getAllTemplates,
   getTemplatesByCategory,
   validateTemplateData
-} from '@/lib/templates/registry';
+} from '@/lib/templates/registry-simple';
 
 export {
   TEMPLATE_PREVIEW_DATA,
-  getTemplatePreviewData,
   getSamplePortfolioData
 } from '@/lib/templates/preview-data';
 

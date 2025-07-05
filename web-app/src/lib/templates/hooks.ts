@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { TemplateType, PortfolioData } from './types';
-import { getTemplateConfig, getTemplatePreviewData, validateTemplateData } from './registry';
+import { getTemplateConfig, getTemplatePreview, validateTemplateData } from './registry-simple';
 import { calculatePortfolioCompletion, validatePortfolioData, getTemplateRecommendations } from './utils';
 
 /**
@@ -12,7 +12,7 @@ import { calculatePortfolioCompletion, validatePortfolioData, getTemplateRecomme
  */
 export function useTemplateConfig(templateType: TemplateType) {
   const config = useMemo(() => getTemplateConfig(templateType), [templateType]);
-  const previewData = useMemo(() => getTemplatePreviewData(templateType), [templateType]);
+  const previewData = useMemo(() => getTemplatePreview(templateType), [templateType]);
 
   return {
     config,
@@ -31,7 +31,7 @@ export function useTemplateValidation(data: PortfolioData, templateType: Templat
   }, [data, templateType]);
 
   const templateValidation = useMemo(() => {
-    return validateTemplateData(data, templateType);
+    return validateTemplateData(templateType, data);
   }, [data, templateType]);
 
   return {
@@ -218,16 +218,16 @@ export function useTemplateLoader() {
       // Dynamically import template component
       switch (templateType) {
         case 'T1':
-          await import('../components/templates/t1');
+          await import('@/components/templates/t1');
           break;
         case 'T2':
-          await import('../components/templates/t2');
+          await import('@/components/templates/t2');
           break;
         case 'T3':
-          await import('../components/templates/t3');
+          await import('@/components/templates/t3');
           break;
         case 'T4':
-          await import('../components/templates/t4');
+          await import('@/components/templates/t4');
           break;
       }
 

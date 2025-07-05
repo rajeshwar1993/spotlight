@@ -42,3 +42,6 @@ export * from './providers/theme-provider';
 
 // Layout Components
 export * from './layout';
+
+// Portfolio Components
+export * from './portfolio';
