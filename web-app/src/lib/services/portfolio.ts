@@ -231,10 +231,10 @@ export async function deletePortfolio(portfolioId: string): Promise<{ error?: Er
 export async function getPortfolioImages(portfolioId: string): Promise<PortfolioImageListResponse> {
   try {
     const { data: images, error } = await supabase
-      .from('portfolio_images')
+      .from('images')
       .select('*')
       .eq('portfolio_id', portfolioId)
-      .order('order_index', { ascending: true });
+      .order('sort_order', { ascending: true });
 
     if (error) {
       console.error('Error fetching portfolio images:', error);
@@ -255,81 +255,34 @@ export async function uploadPortfolioImage(
   portfolioId: string, 
   file: File, 
   imageType: 'profile' | 'hero' | 'gallery',
-  altText?: string
+  altText?: string,
+  userId?: string
 ): Promise<PortfolioImageResponse> {
   try {
-    // Validate file
-    if (!file.type.startsWith('image/')) {
-      return { error: new Error('File must be an image') };
+    // This function is deprecated - use the new image service instead
+    // Import and use uploadPortfolioImage from '@/lib/services/image'
+    const { uploadPortfolioImage: newUploadFunction } = await import('@/lib/services/image');
+    
+    if (!userId) {
+      return { error: new Error('User ID is required') };
     }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      return { error: new Error('File size must be less than 10MB') };
-    }
+    // Map old image types to new enum format
+    const typeMap = {
+      'profile': 'PROFILE' as const,
+      'hero': 'HERO' as const,
+      'gallery': 'GALLERY' as const,
+    };
 
-    // Generate unique filename
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${portfolioId}/${imageType}_${Date.now()}.${fileExtension}`;
+    const result = await newUploadFunction(
+      userId,
+      portfolioId,
+      file,
+      typeMap[imageType],
+      altText
+    );
 
-    // Upload to storage
-    const { error: uploadError } = await supabase.storage
-      .from('portfolio-images')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error('Error uploading portfolio image:', uploadError);
-      return { error: new Error(uploadError.message) };
-    }
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('portfolio-images')
-      .getPublicUrl(fileName);
-
-    const imageUrl = urlData.publicUrl;
-
-    // Get next order index for gallery images
-    let orderIndex = 0;
-    if (imageType === 'gallery') {
-      const { data: existingImages } = await supabase
-        .from('portfolio_images')
-        .select('sort_order')
-        .eq('portfolio_id', portfolioId)
-        .eq('type', 'gallery')
-        .order('sort_order', { ascending: false })
-        .limit(1);
-
-      if (existingImages && existingImages.length > 0 && existingImages[0]) {
-        orderIndex = (existingImages[0].sort_order || 0) + 1;
-      }
-    }
-
-    // Save image record
-    const { data: image, error: saveError } = await supabase
-      .from('portfolio_images')
-      .insert({
-        portfolio_id: portfolioId,
-        type: imageType,
-        file_path: imageUrl,
-        file_name: fileName,
-        alt_text: altText,
-        sort_order: orderIndex,
-        is_primary: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select('*')
-      .single();
-
-    if (saveError) {
-      console.error('Error saving portfolio image record:', saveError);
-      return { error: new Error(saveError.message) };
-    }
-
-    return { data: image };
+    return result;
   } catch (error) {
     console.error('Error in uploadPortfolioImage:', error);
     return { error: error as Error };
@@ -341,37 +294,11 @@ export async function uploadPortfolioImage(
  */
 export async function deletePortfolioImage(imageId: string): Promise<{ error?: Error | null }> {
   try {
-    // Get image record to find file path
-    const { data: image } = await supabase
-      .from('portfolio_images')
-      .select('file_name')
-      .eq('id', imageId)
-      .single();
-
-    if (image?.file_name) {
-      // Delete from storage
-      const { error: deleteError } = await supabase.storage
-        .from('portfolio-images')
-        .remove([image.file_name]);
-
-      if (deleteError) {
-        console.error('Error deleting image file:', deleteError);
-        // Continue to delete record even if file deletion fails
-      }
-    }
-
-    // Delete image record
-    const { error } = await supabase
-      .from('portfolio_images')
-      .delete()
-      .eq('id', imageId);
-
-    if (error) {
-      console.error('Error deleting portfolio image record:', error);
-      return { error: new Error(error.message) };
-    }
-
-    return {};
+    // This function is deprecated - use the new image service instead
+    const { deleteImage } = await import('@/lib/services/image');
+    
+    const result = await deleteImage(imageId);
+    return result;
   } catch (error) {
     console.error('Error in deletePortfolioImage:', error);
     return { error: error as Error };

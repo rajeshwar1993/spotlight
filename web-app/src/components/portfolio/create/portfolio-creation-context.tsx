@@ -30,6 +30,7 @@ export interface PortfolioFormData {
 interface PortfolioCreationState {
   currentStep: number;
   formData: PortfolioFormData;
+  portfolioId?: string | null;
   isComplete: boolean;
   errors: Record<string, string>;
   isSubmitting: boolean;
@@ -42,6 +43,7 @@ type PortfolioCreationAction =
   | { type: 'UPDATE_STEP1'; payload: Partial<Step1Data> }
   | { type: 'UPDATE_STEP2'; payload: Partial<Step2Data> }
   | { type: 'UPDATE_STEP3'; payload: Partial<Step3Data> }
+  | { type: 'SET_PORTFOLIO_ID'; payload: string | null }
   | { type: 'SET_ERRORS'; payload: Record<string, string> }
   | { type: 'CLEAR_ERRORS' }
   | { type: 'SET_SUBMITTING'; payload: boolean }
@@ -69,6 +71,7 @@ const initialFormData: PortfolioFormData = {
 const initialState: PortfolioCreationState = {
   currentStep: 1,
   formData: initialFormData,
+  portfolioId: null,
   isComplete: false,
   errors: {},
   isSubmitting: false,
@@ -116,6 +119,12 @@ function portfolioCreationReducer(
           step3: { ...state.formData.step3, ...action.payload },
         },
         hasUnsavedChanges: true,
+      };
+
+    case 'SET_PORTFOLIO_ID':
+      return {
+        ...state,
+        portfolioId: action.payload,
       };
 
     case 'SET_ERRORS':
@@ -168,6 +177,7 @@ interface PortfolioCreationContextType {
   updateStep1: (data: Partial<Step1Data>) => void;
   updateStep2: (data: Partial<Step2Data>) => void;
   updateStep3: (data: Partial<Step3Data>) => void;
+  setPortfolioId: (portfolioId: string | null) => void;
   setErrors: (errors: Record<string, string>) => void;
   clearErrors: () => void;
   setSubmitting: (submitting: boolean) => void;
@@ -206,6 +216,10 @@ export function PortfolioCreationProvider({ children }: { children: React.ReactN
 
   const updateStep3 = (data: Partial<Step3Data>) => {
     dispatch({ type: 'UPDATE_STEP3', payload: data });
+  };
+
+  const setPortfolioId = (portfolioId: string | null) => {
+    dispatch({ type: 'SET_PORTFOLIO_ID', payload: portfolioId });
   };
 
   const setErrors = (errors: Record<string, string>) => {
@@ -316,6 +330,7 @@ export function PortfolioCreationProvider({ children }: { children: React.ReactN
     updateStep1,
     updateStep2,
     updateStep3,
+    setPortfolioId,
     setErrors,
     clearErrors,
     setSubmitting,

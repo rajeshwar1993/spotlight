@@ -21,7 +21,7 @@ import { FORM_LIMITS } from '@/lib/constants';
 export function Step3BioDetails() {
   const router = useRouter();
   const { user } = useAuth();
-  const { state, updateStep3, setErrors, clearErrors, canProceedToStep, setSubmitting, clearStorage } = usePortfolioCreation();
+  const { state, updateStep3, setErrors, clearErrors, canProceedToStep, setSubmitting, setPortfolioId, clearStorage } = usePortfolioCreation();
   const [isLoading, setIsLoading] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -116,12 +116,15 @@ export function Step3BioDetails() {
         throw new Error(error?.message || 'Failed to create portfolio');
       }
 
+      // Set portfolio ID in context for image upload step
+      setPortfolioId(portfolio.id);
+
       // Clear form data from storage and unsaved changes
       clearStorage();
       setHasUnsavedChanges(false);
 
-      // Redirect to success page with portfolio ID
-      router.push(`/create/success?portfolio=${portfolio.id}`);
+      // Redirect to image upload step
+      router.push('/create/step/4');
     } catch (error) {
       console.error('Portfolio creation error:', error);
       setErrors({ 
@@ -304,12 +307,12 @@ export function Step3BioDetails() {
         canProceed={isValid}
         isLoading={isLoading}
         onNext={handleNext}
-        nextLabel="Create My Portfolio"
+        nextLabel="Continue to Images"
       />
 
       {/* Progress Info */}
       <div className="text-center text-sm text-gray-500">
-        <p>Step 3 of 3 • Almost done! Your portfolio will be created as a draft.</p>
+        <p>Step 3 of 4 • Almost done! Next you can add images to your portfolio.</p>
       </div>
       </div>
     </AuthGuard>
