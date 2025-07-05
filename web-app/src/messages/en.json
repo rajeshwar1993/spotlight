@@ -1,0 +1,106 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "navigation": {
+    "breadcrumb": {
+      "home": "Home",
+      "dashboard": "Dashboard", 
+      "profile": "Profile",
+      "settings": "Settings",
+      "auth": "Authentication",
+      "signin": "Sign In",
+      "signup": "Sign Up",
+      "reset-password": "Reset Password",
+      "verify": "Verify Email",
+      "create": "Create Portfolio",
+      "examples": "Examples",
+      "templates": "Templates",
+      "pricing": "Pricing"
+    },
+    "navbar": {
+      "dashboard": "Dashboard",
+      "createPortfolio": "Create Portfolio",
+      "profile": "Profile",
+      "examples": "Examples",
+      "templates": "Templates",
+      "pricing": "Pricing",
+      "signin": "Sign In",
+      "signup": "Get Started",
+      "signout": "Sign Out"
+    },
+    "footer": {
+      "product": "Product",
+      "company": "Company",
+      "resources": "Resources",
+      "legal": "Legal"
+    }
+  },
+  "auth": {
+    "signin": {
+      "title": "Sign In to Your Account",
+      "subtitle": "Welcome back! Please sign in to access your portfolio dashboard."
+    },
+    "signup": {
+      "title": "Create Your Account",
+      "subtitle": "Join thousands of actors and models showcasing their talent."
+    },
+    "resetPassword": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password."
+    },
+    "verify": {
+      "title": "Verify Your Email",
+      "subtitle": "We've sent a verification link to your email address."
+    }
+  },
+  "errors": {
+    "404": {
+      "title": "Page Not Found",
+      "description": "The page you're looking for doesn't exist or has been moved.",
+      "action": "Go Home"
+    },
+    "500": {
+      "title": "Something Went Wrong",
+      "description": "We're experiencing technical difficulties. Please try again later.",
+      "action": "Try Again"
+    },
+    "general": {
+      "title": "An Error Occurred",
+      "description": "Something unexpected happened. Please try again.",
+      "action": "Retry"
+    }
+  },
+  "announcements": {
+    "dismiss": "Dismiss",
+    "learnMore": "Learn More"
+  },
+  "seo": {
+    "home": {
+      "title": "Spotlight - Professional Portfolios for Actors & Models",
+      "description": "Create stunning professional portfolios in under 5 minutes. Join thousands of actors and models showcasing their talent with Spotlight."
+    },
+    "dashboard": {
+      "title": "Dashboard - Spotlight",
+      "description": "Manage your portfolios, view analytics, and grow your acting or modeling career."
+    },
+    "profile": {
+      "title": "Profile - Spotlight",
+      "description": "Manage your profile information and account settings."
+    }
+  }
+}

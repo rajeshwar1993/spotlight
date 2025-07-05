@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, User, Settings, LogOut, Sparkles } from 'lucide-react';
+import { Menu, X, Settings, LogOut, Sparkles, User as UserIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -81,7 +81,7 @@ function UserMenu({ user, onSignOut }: UserMenuProps) {
               className="h-8 w-8 rounded-full object-cover"
             />
           ) : (
-            <User className="h-4 w-4" />
+            <UserIcon className="h-4 w-4" />
           )}
         </Button>
       </DropdownMenuTrigger>
@@ -93,7 +93,7 @@ function UserMenu({ user, onSignOut }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href={ROUTES.profile} className="cursor-pointer">
-            <User className="mr-2 h-4 w-4" />
+            <UserIcon className="mr-2 h-4 w-4" />
             Profile
           </Link>
         </DropdownMenuItem>
@@ -168,7 +168,7 @@ function MobileNav({ isAuthenticated, user, onSignOut, pathname }: MobileNavProp
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-full bg-spotlight-100 dark:bg-spotlight-800 flex items-center justify-center">
-                      <User className="h-5 w-5 text-spotlight-600" />
+                      <UserIcon className="h-5 w-5 text-spotlight-600" />
                     </div>
                   )}
                   <div>

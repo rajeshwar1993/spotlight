@@ -7,6 +7,7 @@ import { Navbar } from './navbar';
 import { Footer } from './footer';
 import { AnnouncementBannerContainer } from './announcement-banner';
 import { GlobalErrorBoundary } from './error-boundary';
+import { BreadcrumbNavigation } from '@/components/navigation';
 import { cn } from '@/lib/utils';
 
 // =============================================================================
@@ -47,6 +48,17 @@ const SPECIAL_BACKGROUND_ROUTES = [
   '/auth/verify',
 ] as const;
 
+// Pages that should show breadcrumb navigation
+const BREADCRUMB_ENABLED_ROUTES = [
+  '/dashboard',
+  '/profile',
+  '/profile/settings',
+  '/create',
+  '/examples',
+  '/templates',
+  '/pricing',
+] as const;
+
 // =============================================================================
 // Layout Components
 // =============================================================================
@@ -78,6 +90,7 @@ interface PageWrapperProps {
   hasFooter: boolean;
   hasAnnouncement: boolean;
   isSpecialBackground: boolean;
+  hasBreadcrumb: boolean;
 }
 
 function PageWrapper({ 
@@ -86,7 +99,8 @@ function PageWrapper({
   hasNavbar, 
   hasFooter, 
   hasAnnouncement,
-  isSpecialBackground 
+  isSpecialBackground,
+  hasBreadcrumb 
 }: PageWrapperProps) {
   return (
     <div 
@@ -119,6 +133,12 @@ function PageWrapper({
           !hasNavbar && !hasAnnouncement && 'pt-0',
         )}
       >
+        {/* Breadcrumb Navigation */}
+        {hasBreadcrumb && (
+          <div className="container-spotlight pt-6">
+            <BreadcrumbNavigation />
+          </div>
+        )}
         {children}
       </main>
 
@@ -149,6 +169,7 @@ export function MainLayout({ children, className }: MainLayoutProps) {
   const shouldShowFooter = !FOOTER_HIDDEN_ROUTES.some(route => pathname === route);
   const shouldShowAnnouncement = !ANNOUNCEMENT_HIDDEN_ROUTES.some(route => pathname === route);
   const isSpecialBackground = SPECIAL_BACKGROUND_ROUTES.some(route => pathname === route);
+  const shouldShowBreadcrumb = BREADCRUMB_ENABLED_ROUTES.some(route => pathname.startsWith(route));
 
   return (
     <GlobalErrorBoundary>
@@ -158,6 +179,7 @@ export function MainLayout({ children, className }: MainLayoutProps) {
         hasFooter={shouldShowFooter}
         hasAnnouncement={shouldShowAnnouncement}
         isSpecialBackground={isSpecialBackground}
+        hasBreadcrumb={shouldShowBreadcrumb}
       >
         {children}
       </PageWrapper>
@@ -279,6 +301,7 @@ interface LayoutContextValue {
   hasFooter: boolean;
   hasAnnouncement: boolean;
   isSpecialBackground: boolean;
+  hasBreadcrumb: boolean;
   pathname: string;
 }
 
@@ -292,6 +315,7 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     hasFooter: !FOOTER_HIDDEN_ROUTES.some(route => pathname === route),
     hasAnnouncement: !ANNOUNCEMENT_HIDDEN_ROUTES.some(route => pathname === route),
     isSpecialBackground: SPECIAL_BACKGROUND_ROUTES.some(route => pathname === route),
+    hasBreadcrumb: BREADCRUMB_ENABLED_ROUTES.some(route => pathname.startsWith(route)),
     pathname,
   };
 
