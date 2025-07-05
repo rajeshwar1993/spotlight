@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase/client';
-import type { User, UserProfileForm } from '@/types';
+import type { User } from '@/types';
+import type { UserProfileForm } from '@/lib/validations';
 
 export interface UserProfileResponse {
   data?: User;
@@ -295,7 +296,7 @@ export async function deleteAvatar(userId: string): Promise<{ error?: Error | nu
  * Check if profile is complete
  */
 export function isProfileComplete(user: User): boolean {
-  return calculateProfileCompletion(user) >= 80;
+  return calculateProfileCompletion(user as unknown as Record<string, unknown>) >= 80;
 }
 
 /**

@@ -68,7 +68,7 @@ export function AvatarUpload({ onSuccess, onError }: AvatarUploadProps) {
         });
         onSuccess?.(result.url);
       }
-    } catch (error) {
+    } catch {
       const errorMsg = 'An unexpected error occurred during upload';
       setMessage({ type: 'error', text: errorMsg });
       onError?.(errorMsg);
@@ -132,7 +132,7 @@ export function AvatarUpload({ onSuccess, onError }: AvatarUploadProps) {
         });
         setPreview(null);
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: 'error',
         text: 'An unexpected error occurred while deleting avatar',

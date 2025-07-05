@@ -12,7 +12,7 @@ import { userProfileSchema, type UserProfileForm } from '@/lib/validations';
 import { Profession, Gender } from '@/types';
 
 interface UserProfileFormProps {
-  onSuccess?: (updatedUser: any) => void;
+  onSuccess?: (updatedUser: unknown) => void;
   onCancel?: () => void;
   showCancelButton?: boolean;
 }
@@ -32,7 +32,6 @@ export function UserProfileFormComponent({
     register,
     handleSubmit,
     formState: { errors, isDirty },
-    setValue,
     watch,
     reset,
   } = useForm<UserProfileForm>({
@@ -65,7 +64,7 @@ export function UserProfileFormComponent({
     if (user) {
       reset({
         full_name: user.full_name || '',
-        profession: user.profession,
+        profession: user.profession || Profession.ACTOR,
         gender: user.gender || undefined,
         date_of_birth: user.date_of_birth || '',
         location: user.location || '',
@@ -103,7 +102,7 @@ export function UserProfileFormComponent({
           onSuccess(result.data);
         }
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: 'error',
         text: 'An unexpected error occurred. Please try again.',

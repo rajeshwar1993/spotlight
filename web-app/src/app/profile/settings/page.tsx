@@ -63,7 +63,7 @@ export default function ProfileSettingsPage() {
         setNewPassword('');
         setConfirmPassword('');
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: 'error',
         text: 'An unexpected error occurred. Please try again.',
@@ -93,7 +93,7 @@ export default function ProfileSettingsPage() {
           text: 'Verification email sent! Please check your inbox.',
         });
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: 'error',
         text: 'An unexpected error occurred. Please try again.',

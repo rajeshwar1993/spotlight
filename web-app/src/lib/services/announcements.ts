@@ -67,7 +67,8 @@ export function subscribeToAnnouncements(
   return supabase
     .channel('announcements')
     .on(
-      'postgres_changes',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      'postgres_changes' as any,
       {
         event: '*',
         schema: 'public',

@@ -112,5 +112,4 @@ export {
   CardDescription,
   CardContent,
   cardVariants,
-  type CardProps,
 };

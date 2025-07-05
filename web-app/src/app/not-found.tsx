@@ -1,20 +1,13 @@
+'use client';
+
 import * as React from 'react';
 import Link from 'next/link';
 import { Home, ArrowLeft, Search } from 'lucide-react';
-// Temporarily disable next-intl
-// import { getTranslations } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ROUTES } from '@/lib/constants';
 
-export async function generateMetadata() {
-  return {
-    title: 'Page Not Found',
-    description: 'The page you\'re looking for doesn\'t exist or has been moved.',
-    robots: 'noindex, nofollow',
-  };
-}
 
 export default function NotFound() {
 

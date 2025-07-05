@@ -3,7 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
-import type { User, UserProfileForm } from '@/types';
+import type { User } from '@/types';
+import type { UserProfileForm } from '@/lib/validations';
 import { 
   updateUserProfile, 
   uploadAvatar, 
