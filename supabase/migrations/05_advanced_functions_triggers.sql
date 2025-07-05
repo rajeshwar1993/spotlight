@@ -5,7 +5,14 @@
 CREATE EXTENSION IF NOT EXISTS "unaccent";
 
 -- Create custom text search configuration for portfolios
-CREATE TEXT SEARCH CONFIGURATION IF NOT EXISTS public.portfolio_search (COPY = pg_catalog.english);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_ts_config WHERE cfgname = 'portfolio_search'
+  ) THEN
+    CREATE TEXT SEARCH CONFIGURATION public.portfolio_search (COPY = pg_catalog.english);
+  END IF;
+END $$;
 ALTER TEXT SEARCH CONFIGURATION public.portfolio_search
   ALTER MAPPING FOR asciiword, asciihword, hword_asciipart, word, hword, hword_part
   WITH unaccent, simple;
