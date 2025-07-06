@@ -6,14 +6,13 @@ import type { TemplateProps } from '@/lib/templates/types';
 import {
   BaseTemplateLayout,
   TemplateSectionWrapper,
-  TemplateProfileImage,
-  TemplateSocialLinks
+  TemplateProfileImage
 } from '../base-template';
 
 // T4 - Creative Artistic Template
 export default function T4Template({
   data,
-  isPreview = false,
+  isPreview,
   isEditing = false,
   className,
   onSectionClick
@@ -176,8 +175,8 @@ export default function T4Template({
               <div className="p-6 bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-2xl border border-purple-500/30">
                 <h3 className="text-xl font-bold text-white mb-3">Artistic Vision</h3>
                 <p className="text-gray-300">
-                  "Every project is an opportunity to push creative boundaries and tell stories that resonate on a deeper level. 
-                  I believe in the power of authentic expression and collaborative artistry."
+                  &quot;Every project is an opportunity to push creative boundaries and tell stories that resonate on a deeper level. 
+                  I believe in the power of authentic expression and collaborative artistry.&quot;
                 </p>
               </div>
 
@@ -354,13 +353,13 @@ export default function T4Template({
           <div className="text-center">
             <h2 className="text-4xl lg:text-6xl font-bold mb-8">
               <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
-                Let's Create Magic
+                Let&apos;s Create Magic
               </span>
             </h2>
 
             <p className="text-xl text-gray-300 mb-16 max-w-2xl mx-auto leading-relaxed">
               Ready to embark on a creative journey that pushes boundaries and creates something extraordinary? 
-              Let's collaborate and bring your wildest visions to life.
+              Let&apos;s collaborate and bring your wildest visions to life.
             </p>
 
             {/* Creative Contact Grid */}

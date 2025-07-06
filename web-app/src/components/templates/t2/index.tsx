@@ -10,13 +10,12 @@ import {
   TemplateHeroImage,
   TemplateGalleryGrid,
   TemplateSkillsList,
-  TemplateSocialLinks
 } from '../base-template';
 
 // T2 - Modern Bold Template
 export default function T2Template({
   data,
-  isPreview = false,
+  isPreview,
   isEditing = false,
   className,
   onSectionClick
@@ -264,7 +263,7 @@ export default function T2Template({
             </h2>
 
             <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Ready to bring bold visions to life? I'm available for exciting new projects, 
+              Ready to bring bold visions to life? I&apos;m available for exciting new projects, 
               collaborations, and creative challenges that push boundaries.
             </p>
 

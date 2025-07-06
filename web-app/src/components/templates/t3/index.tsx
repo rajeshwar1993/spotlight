@@ -7,13 +7,12 @@ import {
   BaseTemplateLayout,
   TemplateSectionWrapper,
   TemplateProfileImage,
-  TemplateSocialLinks
 } from '../base-template';
 
 // T3 - Minimal Elegant Template
 export default function T3Template({
   data,
-  isPreview = false,
+  isPreview,
   isEditing = false,
   className,
   onSectionClick
