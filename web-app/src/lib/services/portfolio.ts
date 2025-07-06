@@ -471,3 +471,20 @@ export async function generateSlug(title: string, excludePortfolioId?: string): 
 
   return slug;
 }
+
+// Portfolio service object for easier importing
+export const portfolioService = {
+  getPortfolio,
+  getUserPortfolios,
+  getPortfolioBySlug,
+  createPortfolio,
+  updatePortfolio,
+  deletePortfolio,
+  getPortfolioImages,
+  createPortfolioImage,
+  updatePortfolioImage,
+  deletePortfolioImage,
+  getPortfolioData,
+  generateSlug,
+  isSlugAvailable
+};

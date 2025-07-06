@@ -160,6 +160,9 @@ export const portfolioSchema = z.object({
   seo_keywords: z.array(z.string().max(50)).max(10).optional(),
 });
 
+// Update portfolio schema (partial)
+export const updatePortfolioSchema = portfolioSchema.partial();
+
 // Portfolio skill schema
 export const portfolioSkillSchema = z.object({
   skill_name: z.string().min(1).max(100),
