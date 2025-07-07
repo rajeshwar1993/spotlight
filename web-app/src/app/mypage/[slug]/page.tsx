@@ -5,6 +5,10 @@ import { SocialShare } from '@/components/portfolio/social-share';
 import { portfolioService } from '@/lib/services/portfolio';
 import type { PortfolioData } from '@/lib/templates/types';
 import { APP_CONFIG } from '@/lib/constants';
+import { 
+  generatePortfolioMetaTags,
+  generatePortfolioJSONLD
+} from '@/lib/seo';
 
 interface PageProps {
   params: Promise<{
@@ -67,74 +71,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const { user, portfolio } = portfolioData;
-  const title = `${user.full_name || portfolio.title} | ${user.profession || 'Portfolio'} | Spotlight`;
-  const description = portfolio.bio || 
-    `Professional ${user.profession?.toLowerCase()} portfolio for ${user.full_name || portfolio.title}. ${user.location ? `Based in ${user.location}.` : ''}`;
-  
-  const portfolioUrl = `${APP_CONFIG.url}/mypage/${portfolio.slug}`;
-  const imageUrl = portfolioData.images.hero?.file_path || 
-                   portfolioData.images.profile?.file_path || 
-                   `${APP_CONFIG.url}/images/default-portfolio-share.jpg`;
-
-  return {
-    title,
-    description,
-    keywords: [
-      user.profession?.toLowerCase(),
-      user.full_name?.toLowerCase(),
-      user.location?.toLowerCase(),
-      'portfolio',
-      'actor',
-      'model',
-      'spotlight',
-      ...(portfolio.skills || [])
-    ].filter(Boolean),
-    authors: [{ name: user.full_name || 'Portfolio Owner' }],
-    creator: user.full_name || 'Portfolio Owner',
-    publisher: 'Spotlight',
-    category: 'Portfolio',
-    
-    // Open Graph
-    openGraph: {
-      type: 'profile',
-      title,
-      description,
-      url: portfolioUrl,
-      siteName: 'Spotlight',
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: `${user.full_name || portfolio.title} - Portfolio`,
-        }
-      ],
-      locale: 'en_US',
-    },
-
-    // Twitter Card
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [imageUrl],
-      creator: '@SpotlightApp', // TODO: Update with actual Twitter handle
-    },
-
-    // Additional SEO
-    canonical: portfolioUrl,
-    alternates: {
-      canonical: portfolioUrl,
-    },
-    
-    // Schema.org structured data will be added in the component
-    other: {
-      'profile:first_name': user.full_name?.split(' ')[0] || '',
-      'profile:last_name': user.full_name?.split(' ').slice(1).join(' ') || '',
-      'profile:username': portfolio.slug,
-    },
-  };
+  // Use enhanced meta tag generation
+  return generatePortfolioMetaTags(portfolioData);
 }
 
 export default async function PublicPortfolioPage({ params }: PageProps) {
@@ -148,38 +86,16 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
   const { user, portfolio } = portfolioData;
   const portfolioUrl = `${APP_CONFIG.url}/mypage/${portfolio.slug}`;
 
-  // Generate JSON-LD structured data for SEO
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: user.full_name || portfolio.title,
-    jobTitle: user.profession,
-    description: portfolio.bio,
-    url: portfolioUrl,
-    image: portfolioData.images.profile?.file_path || portfolioData.images.hero?.file_path,
-    address: user.location ? {
-      '@type': 'Place',
-      name: user.location
-    } : undefined,
-    sameAs: [
-      user.website_url,
-      portfolioData.social_links.instagram ? `https://instagram.com/${portfolioData.social_links.instagram}` : null,
-      portfolioData.social_links.twitter ? `https://twitter.com/${portfolioData.social_links.twitter}` : null,
-      portfolioData.social_links.linkedin ? `https://linkedin.com/in/${portfolioData.social_links.linkedin}` : null,
-      portfolioData.social_links.tiktok ? `https://tiktok.com/@${portfolioData.social_links.tiktok}` : null,
-    ].filter(Boolean),
-    knowsAbout: portfolio.skills,
-    alumniOf: undefined, // TODO: Add education data when available
-    award: undefined, // TODO: Add awards data when available
-  };
+  // Generate comprehensive structured data using new SEO utilities
+  const jsonLDData = generatePortfolioJSONLD(portfolioData);
 
   return (
     <>
-      {/* Structured Data for SEO */}
+      {/* Enhanced Structured Data for SEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
+          __html: jsonLDData.combined,
         }}
       />
 
