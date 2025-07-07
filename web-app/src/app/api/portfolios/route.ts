@@ -102,10 +102,7 @@ export async function POST(request: NextRequest) {
     const validatedData = portfolioSchema.parse(body);
 
     // Create portfolio using service
-    const portfolio = await portfolioService.createPortfolio({
-      ...validatedData,
-      user_id: user.id
-    });
+    const portfolio = await portfolioService.createPortfolio(user.id, validatedData);
 
     if (!portfolio) {
       return NextResponse.json({ error: 'Failed to create portfolio' }, { status: 500 });

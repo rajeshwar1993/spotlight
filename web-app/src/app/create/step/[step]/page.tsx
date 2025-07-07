@@ -6,13 +6,14 @@ import { Step2TemplateSelection } from '@/components/portfolio/create/step-2-tem
 import { Step3BioDetails } from '@/components/portfolio/create/step-3-bio-details';
 
 interface StepPageProps {
-  params: {
+  params: Promise<{
     step: string;
-  };
+  }>;
 }
 
-export default function StepPage({ params }: StepPageProps) {
-  const stepNumber = parseInt(params.step);
+export default async function StepPage({ params }: StepPageProps) {
+  const { step } = await params;
+  const stepNumber = parseInt(step);
 
   // Validate step number
   if (isNaN(stepNumber) || stepNumber < 1 || stepNumber > 3) {

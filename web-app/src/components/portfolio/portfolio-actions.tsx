@@ -77,7 +77,7 @@ export function PortfolioActions({
         },
         body: JSON.stringify({
           status: newStatus,
-          is_published: newStatus === 'published'
+          is_published: newStatus === 'PUBLISHED'
         }),
       });
 
@@ -91,7 +91,7 @@ export function PortfolioActions({
 
       toast({
         title: 'Status Updated',
-        description: `Portfolio ${newStatus === 'published' ? 'published' : 'unpublished'} successfully.`,
+        description: `Portfolio ${newStatus === 'PUBLISHED' ? 'published' : 'unpublished'} successfully.`,
       });
 
     } catch (error) {
@@ -194,11 +194,11 @@ export function PortfolioActions({
 
   const getStatusColor = (status: PortfolioStatus) => {
     switch (status) {
-      case 'published':
+      case 'PUBLISHED':
         return 'bg-green-100 text-green-800';
-      case 'draft':
+      case 'DRAFT':
         return 'bg-yellow-100 text-yellow-800';
-      case 'archived':
+      case 'ARCHIVED':
         return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -226,18 +226,18 @@ export function PortfolioActions({
           variant="outline"
           size="sm"
           onClick={() => handleStatusChange(
-            portfolio.status === 'published' ? 'draft' : 'published'
+            portfolio.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED'
           )}
           disabled={isUpdatingStatus}
         >
           {isUpdatingStatus ? (
             <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-          ) : portfolio.status === 'published' ? (
+          ) : portfolio.status === 'PUBLISHED' ? (
             <EyeOff className="h-4 w-4 mr-1" />
           ) : (
             <Eye className="h-4 w-4 mr-1" />
           )}
-          {portfolio.status === 'published' ? 'Unpublish' : 'Publish'}
+          {portfolio.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
         </Button>
 
         {/* Archive/Unarchive */}
@@ -245,16 +245,16 @@ export function PortfolioActions({
           variant="outline"
           size="sm"
           onClick={() => handleStatusChange(
-            portfolio.status === 'archived' ? 'draft' : 'archived'
+            portfolio.status === 'ARCHIVED' ? 'DRAFT' : 'ARCHIVED'
           )}
           disabled={isUpdatingStatus}
         >
-          {portfolio.status === 'archived' ? (
+          {portfolio.status === 'ARCHIVED' ? (
             <ArchiveRestore className="h-4 w-4 mr-1" />
           ) : (
             <Archive className="h-4 w-4 mr-1" />
           )}
-          {portfolio.status === 'archived' ? 'Restore' : 'Archive'}
+          {portfolio.status === 'ARCHIVED' ? 'Restore' : 'Archive'}
         </Button>
 
         {/* Share */}
@@ -407,7 +407,7 @@ export function StatusToggle({
     try {
       setIsUpdating(true);
       
-      const newStatus = portfolio.status === 'published' ? 'draft' : 'published';
+      const newStatus = portfolio.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
       
       const response = await fetch(`/api/portfolios/${portfolio.id}`, {
         method: 'PUT',
@@ -416,7 +416,7 @@ export function StatusToggle({
         },
         body: JSON.stringify({
           status: newStatus,
-          is_published: newStatus === 'published'
+          is_published: newStatus === 'PUBLISHED'
         }),
       });
 
@@ -430,7 +430,7 @@ export function StatusToggle({
 
       toast({
         title: 'Status Updated',
-        description: `Portfolio ${newStatus === 'published' ? 'published' : 'unpublished'} successfully.`,
+        description: `Portfolio ${newStatus === 'PUBLISHED' ? 'published' : 'unpublished'} successfully.`,
       });
 
     } catch (error) {
@@ -446,12 +446,12 @@ export function StatusToggle({
 
   return (
     <Button
-      variant={portfolio.status === 'published' ? 'default' : 'outline'}
+      variant={portfolio.status === 'PUBLISHED' ? 'default' : 'outline'}
       size={size}
       onClick={handleToggle}
       disabled={isUpdating}
       className={cn(
-        portfolio.status === 'published' 
+        portfolio.status === 'PUBLISHED' 
           ? 'bg-green-600 hover:bg-green-700' 
           : '',
         className
@@ -459,12 +459,12 @@ export function StatusToggle({
     >
       {isUpdating ? (
         <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-      ) : portfolio.status === 'published' ? (
+      ) : portfolio.status === 'PUBLISHED' ? (
         <Eye className="h-4 w-4 mr-1" />
       ) : (
         <EyeOff className="h-4 w-4 mr-1" />
       )}
-      {portfolio.status === 'published' ? 'Published' : 'Draft'}
+      {portfolio.status === 'PUBLISHED' ? 'Published' : 'Draft'}
     </Button>
   );
 }

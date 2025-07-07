@@ -5,7 +5,7 @@ import { portfolioService } from '@/lib/services/portfolio';
 // POST /api/portfolios/[id]/duplicate - Duplicate portfolio
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -15,35 +15,33 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     // Check if portfolio exists and user owns it
-    const existingPortfolio = await portfolioService.getPortfolio(params.id);
-    if (!existingPortfolio) {
+    const portfolioResult = await portfolioService.getPortfolio(id);
+    if (portfolioResult.error || !portfolioResult.data) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
     }
-    if (existingPortfolio.user_id !== user.id) {
+    if (portfolioResult.data.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
     const { title } = body;
 
-    // Create duplicate portfolio
+    // Create duplicate portfolio 
     const duplicateData = {
-      ...existingPortfolio,
-      title: title || `${existingPortfolio.title} (Copy)`,
+      title: title || `${portfolioResult.data.title} (Copy)`,
       slug: '', // Will be generated
-      status: 'draft' as const,
-      is_published: false,
-      view_count: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      template_type: portfolioResult.data.template,
+      bio: portfolioResult.data.bio || undefined,
+      height: portfolioResult.data.height || undefined,
+      weight: portfolioResult.data.weight || undefined,
+      hair_color: portfolioResult.data.hair_color || undefined,
+      eye_color: portfolioResult.data.eye_color || undefined,
+      is_published: false
     };
 
-    // Remove fields that shouldn't be copied
-    delete duplicateData.id;
-    delete duplicateData.images;
-
-    const duplicatedPortfolio = await portfolioService.createPortfolio(duplicateData);
+    const duplicatedPortfolio = await portfolioService.createPortfolio(user.id, duplicateData);
 
     if (!duplicatedPortfolio) {
       return NextResponse.json({ error: 'Failed to duplicate portfolio' }, { status: 500 });

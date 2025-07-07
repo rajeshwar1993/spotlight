@@ -7,7 +7,7 @@ import { z } from 'zod';
 // GET /api/portfolios/[id] - Get single portfolio
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -17,18 +17,19 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const portfolio = await portfolioService.getPortfolio(params.id);
+    const { id } = await params;
+    const portfolioResult = await portfolioService.getPortfolio(id);
     
-    if (!portfolio) {
+    if (portfolioResult.error || !portfolioResult.data) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
     }
 
     // Check if user owns this portfolio
-    if (portfolio.user_id !== user.id) {
+    if (portfolioResult.data.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    return NextResponse.json({ data: portfolio });
+    return NextResponse.json({ data: portfolioResult.data });
 
   } catch (error) {
     console.error('API Error:', error);
@@ -39,7 +40,7 @@ export async function GET(
 // PUT /api/portfolios/[id] - Update portfolio
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -49,12 +50,13 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     // Check if portfolio exists and user owns it
-    const existingPortfolio = await portfolioService.getPortfolio(params.id);
-    if (!existingPortfolio) {
+    const portfolioResult = await portfolioService.getPortfolio(id);
+    if (portfolioResult.error || !portfolioResult.data) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
     }
-    if (existingPortfolio.user_id !== user.id) {
+    if (portfolioResult.data.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -64,7 +66,7 @@ export async function PUT(
     const validatedData = updatePortfolioSchema.parse(body);
 
     // Update portfolio using service
-    const portfolio = await portfolioService.updatePortfolio(params.id, validatedData);
+    const portfolio = await portfolioService.updatePortfolio(id, validatedData);
 
     if (!portfolio) {
       return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 });
@@ -88,7 +90,7 @@ export async function PUT(
 // DELETE /api/portfolios/[id] - Delete portfolio
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -98,17 +100,18 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     // Check if portfolio exists and user owns it
-    const existingPortfolio = await portfolioService.getPortfolio(params.id);
-    if (!existingPortfolio) {
+    const portfolioResult = await portfolioService.getPortfolio(id);
+    if (portfolioResult.error || !portfolioResult.data) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
     }
-    if (existingPortfolio.user_id !== user.id) {
+    if (portfolioResult.data.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Delete portfolio using service
-    const success = await portfolioService.deletePortfolio(params.id);
+    const success = await portfolioService.deletePortfolio(id);
 
     if (!success) {
       return NextResponse.json({ error: 'Failed to delete portfolio' }, { status: 500 });
