@@ -6,6 +6,8 @@ import { PortfolioList } from '@/components/portfolio/portfolio-list';
 import { PortfolioEditForm } from '@/components/portfolio/portfolio-edit-form-simple';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CompactVerificationBanner } from '@/components/email-verification/verification-banner';
+import { emailVerificationService } from '@/lib/services/email-verification';
 import { Plus, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 // import { useSearchParams } from 'next/navigation';
@@ -30,7 +32,7 @@ interface Portfolio {
 }
 
 export default function PortfoliosPage() {
-  const { loading, isAuthenticated } = useUser();
+  const { user, loading, isAuthenticated } = useUser();
   // const searchParams = useSearchParams();
   // const editId = searchParams.get('edit'); // For future use
   
@@ -69,6 +71,10 @@ export default function PortfoliosPage() {
 
   const handleStatusChange = () => {
     setRefreshKey(prev => prev + 1); // Trigger refresh of portfolio list
+  };
+
+  const handleResendVerification = async () => {
+    return emailVerificationService.resendVerificationEmail();
   };
 
   if (loading) {
@@ -131,6 +137,14 @@ export default function PortfoliosPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
+        {/* Email Verification Banner */}
+        <CompactVerificationBanner
+          isVisible={!user?.is_email_verified}
+          isEmailVerified={user?.is_email_verified}
+          onResendVerification={handleResendVerification}
+          className="mb-6"
+        />
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

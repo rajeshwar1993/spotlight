@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProfileCompletion } from '@/components/ui/profile-completion';
+import { EmailVerificationBanner } from '@/components/email-verification/verification-banner';
+import { emailVerificationService } from '@/lib/services/email-verification';
 import { useState, useEffect } from 'react';
 import { Plus, Eye, Grid, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
@@ -43,6 +45,10 @@ export default function DashboardPage() {
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const handleResendVerification = async () => {
+    return emailVerificationService.resendVerificationEmail();
   };
 
   const fetchPortfolioStats = async () => {
@@ -95,6 +101,16 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
+        {/* Email Verification Banner */}
+        <EmailVerificationBanner
+          isVisible={!user?.is_email_verified}
+          isEmailVerified={user?.is_email_verified}
+          userEmail={user?.email}
+          onResendVerification={handleResendVerification}
+          className="mb-6"
+          variant="prominent"
+        />
+
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { portfolioService } from '@/lib/services/portfolio';
+import { portfolioServerService } from '@/lib/services/portfolio-server';
 import { updatePortfolioSchema } from '@/lib/validations';
 import { z } from 'zod';
 
@@ -52,7 +53,7 @@ export async function PUT(
 
     const { id } = await params;
     // Check if portfolio exists and user owns it
-    const portfolioResult = await portfolioService.getPortfolio(id);
+    const portfolioResult = await portfolioServerService.getPortfolio(id);
     if (portfolioResult.error || !portfolioResult.data) {
       return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 });
     }
@@ -65,14 +66,25 @@ export async function PUT(
     // Validate request body
     const validatedData = updatePortfolioSchema.parse(body);
 
-    // Update portfolio using service
-    const portfolio = await portfolioService.updatePortfolio(id, validatedData);
+    // Update portfolio using server service with email verification
+    const portfolio = await portfolioServerService.updatePortfolio(id, validatedData);
 
-    if (!portfolio) {
+    if (portfolio.error) {
+      // Check if it's an email verification error
+      if (portfolio.error.message.includes('Email verification required')) {
+        return NextResponse.json({ 
+          error: portfolio.error.message,
+          requiresEmailVerification: true 
+        }, { status: 403 });
+      }
+      return NextResponse.json({ error: portfolio.error.message }, { status: 500 });
+    }
+
+    if (!portfolio.data) {
       return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 });
     }
 
-    return NextResponse.json({ data: portfolio });
+    return NextResponse.json({ data: portfolio.data });
 
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -46,6 +46,8 @@ interface PortfolioActionsProps {
   onUpdate?: (portfolio: Portfolio) => void;
   onDelete?: (portfolioId: string) => void;
   onDuplicate?: (portfolio: Portfolio, newTitle: string) => void;
+  userEmailVerified?: boolean;
+  onRequestEmailVerification?: () => void;
   className?: string;
 }
 
@@ -54,6 +56,8 @@ export function PortfolioActions({
   onUpdate,
   onDelete,
   onDuplicate,
+  userEmailVerified = true,
+  onRequestEmailVerification,
   className
 }: PortfolioActionsProps) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -83,6 +87,22 @@ export function PortfolioActions({
 
       if (!response.ok) {
         const error = await response.json();
+        
+        // Handle email verification error specifically
+        if (error.requiresEmailVerification) {
+          toast({
+            title: 'Email Verification Required',
+            description: 'Please verify your email address before publishing your portfolio.',
+            variant: 'destructive',
+            action: onRequestEmailVerification ? (
+              <Button variant="outline" size="sm" onClick={onRequestEmailVerification}>
+                Verify Email
+              </Button>
+            ) : undefined,
+          });
+          return;
+        }
+        
         throw new Error(error.error || 'Failed to update portfolio status');
       }
 
@@ -222,23 +242,34 @@ export function PortfolioActions({
         </Button>
 
         {/* Status Toggle */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleStatusChange(
-            portfolio.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED'
+        <div className="relative">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStatusChange(
+              portfolio.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED'
+            )}
+            disabled={isUpdatingStatus || (!userEmailVerified && portfolio.status !== 'PUBLISHED')}
+            className={!userEmailVerified && portfolio.status !== 'PUBLISHED' ? 'opacity-60' : ''}
+          >
+            {isUpdatingStatus ? (
+              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+            ) : portfolio.status === 'PUBLISHED' ? (
+              <EyeOff className="h-4 w-4 mr-1" />
+            ) : (
+              <>
+                {!userEmailVerified && <AlertTriangle className="h-4 w-4 mr-1 text-amber-500" />}
+                <Eye className="h-4 w-4 mr-1" />
+              </>
+            )}
+            {portfolio.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
+          </Button>
+          {!userEmailVerified && portfolio.status !== 'PUBLISHED' && (
+            <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              !
+            </div>
           )}
-          disabled={isUpdatingStatus}
-        >
-          {isUpdatingStatus ? (
-            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-          ) : portfolio.status === 'PUBLISHED' ? (
-            <EyeOff className="h-4 w-4 mr-1" />
-          ) : (
-            <Eye className="h-4 w-4 mr-1" />
-          )}
-          {portfolio.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
-        </Button>
+        </div>
 
         {/* Archive/Unarchive */}
         <Button
@@ -390,6 +421,8 @@ export function PortfolioActions({
 interface StatusToggleProps {
   portfolio: Portfolio;
   onUpdate?: (portfolio: Portfolio) => void;
+  userEmailVerified?: boolean;
+  onRequestEmailVerification?: () => void;
   size?: 'sm' | 'default';
   className?: string;
 }
@@ -397,6 +430,8 @@ interface StatusToggleProps {
 export function StatusToggle({ 
   portfolio, 
   onUpdate, 
+  userEmailVerified = true,
+  onRequestEmailVerification,
   size = 'default',
   className 
 }: StatusToggleProps) {
@@ -422,6 +457,22 @@ export function StatusToggle({
 
       if (!response.ok) {
         const error = await response.json();
+        
+        // Handle email verification error specifically
+        if (error.requiresEmailVerification) {
+          toast({
+            title: 'Email Verification Required',
+            description: 'Please verify your email address before publishing your portfolio.',
+            variant: 'destructive',
+            action: onRequestEmailVerification ? (
+              <Button variant="outline" size="sm" onClick={onRequestEmailVerification}>
+                Verify Email
+              </Button>
+            ) : undefined,
+          });
+          return;
+        }
+        
         throw new Error(error.error || 'Failed to update portfolio status');
       }
 
@@ -445,26 +496,37 @@ export function StatusToggle({
   };
 
   return (
-    <Button
-      variant={portfolio.status === 'PUBLISHED' ? 'default' : 'outline'}
-      size={size}
-      onClick={handleToggle}
-      disabled={isUpdating}
-      className={cn(
-        portfolio.status === 'PUBLISHED' 
-          ? 'bg-green-600 hover:bg-green-700' 
-          : '',
-        className
+    <div className="relative">
+      <Button
+        variant={portfolio.status === 'PUBLISHED' ? 'default' : 'outline'}
+        size={size}
+        onClick={handleToggle}
+        disabled={isUpdating || (!userEmailVerified && portfolio.status !== 'PUBLISHED')}
+        className={cn(
+          portfolio.status === 'PUBLISHED' 
+            ? 'bg-green-600 hover:bg-green-700' 
+            : '',
+          !userEmailVerified && portfolio.status !== 'PUBLISHED' ? 'opacity-60' : '',
+          className
+        )}
+      >
+        {isUpdating ? (
+          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+        ) : portfolio.status === 'PUBLISHED' ? (
+          <Eye className="h-4 w-4 mr-1" />
+        ) : (
+          <>
+            {!userEmailVerified && <AlertTriangle className="h-4 w-4 mr-1 text-amber-500" />}
+            <EyeOff className="h-4 w-4 mr-1" />
+          </>
+        )}
+        {portfolio.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+      </Button>
+      {!userEmailVerified && portfolio.status !== 'PUBLISHED' && (
+        <div className="absolute -top-1 -right-1 bg-amber-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+          !
+        </div>
       )}
-    >
-      {isUpdating ? (
-        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-      ) : portfolio.status === 'PUBLISHED' ? (
-        <Eye className="h-4 w-4 mr-1" />
-      ) : (
-        <EyeOff className="h-4 w-4 mr-1" />
-      )}
-      {portfolio.status === 'PUBLISHED' ? 'Published' : 'Draft'}
-    </Button>
+    </div>
   );
 }

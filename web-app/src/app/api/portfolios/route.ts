@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { portfolioService } from '@/lib/services/portfolio';
+import { portfolioServerService } from '@/lib/services/portfolio-server';
 import { portfolioSchema } from '@/lib/validations';
 import { z } from 'zod';
 
@@ -101,14 +101,25 @@ export async function POST(request: NextRequest) {
     // Validate request body
     const validatedData = portfolioSchema.parse(body);
 
-    // Create portfolio using service
-    const portfolio = await portfolioService.createPortfolio(user.id, validatedData);
+    // Create portfolio using server service with email verification
+    const portfolio = await portfolioServerService.createPortfolio(user.id, validatedData);
 
-    if (!portfolio) {
+    if (portfolio.error) {
+      // Check if it's an email verification error
+      if (portfolio.error.message.includes('Email verification required')) {
+        return NextResponse.json({ 
+          error: portfolio.error.message,
+          requiresEmailVerification: true 
+        }, { status: 403 });
+      }
+      return NextResponse.json({ error: portfolio.error.message }, { status: 500 });
+    }
+
+    if (!portfolio.data) {
       return NextResponse.json({ error: 'Failed to create portfolio' }, { status: 500 });
     }
 
-    return NextResponse.json({ data: portfolio }, { status: 201 });
+    return NextResponse.json({ data: portfolio.data }, { status: 201 });
 
   } catch (error) {
     if (error instanceof z.ZodError) {

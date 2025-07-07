@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Settings, LogOut, Sparkles, User as UserIcon } from 'lucide-react';
+import { Menu, X, Settings, LogOut, Sparkles, User as UserIcon, AlertTriangle, CheckCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -71,7 +71,7 @@ function UserMenu({ user, onSignOut }: UserMenuProps) {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 w-9 rounded-full p-0"
+          className="h-9 w-9 rounded-full p-0 relative"
           aria-label="User menu"
         >
           {user?.avatar_url ? (
@@ -83,12 +83,30 @@ function UserMenu({ user, onSignOut }: UserMenuProps) {
           ) : (
             <UserIcon className="h-4 w-4" />
           )}
+          {!user?.is_email_verified && (
+            <div className="absolute -top-1 -right-1 h-3 w-3 bg-amber-500 border border-white rounded-full flex items-center justify-center">
+              <span className="text-xs text-white">!</span>
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-52">
         <div className="px-2 py-1.5 text-sm">
           <div className="font-medium">{user?.full_name || 'User'}</div>
           <div className="text-muted-foreground text-xs">{user?.email}</div>
+          <div className="flex items-center gap-1 mt-1">
+            {user?.is_email_verified ? (
+              <>
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                <span className="text-xs text-green-600">Verified</span>
+              </>
+            ) : (
+              <>
+                <AlertTriangle className="h-3 w-3 text-amber-500" />
+                <span className="text-xs text-amber-600">Unverified</span>
+              </>
+            )}
+          </div>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
