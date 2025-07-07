@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { APP_CONFIG } from '@/lib/constants';
+import { portfolioService } from '@/lib/services/portfolio';
 
 // Static routes that should be included in the sitemap
 const STATIC_ROUTES = [
@@ -19,7 +20,29 @@ const AUTH_ROUTES = [
   '/create',
 ];
 
-function generateSitemapXML(): string {
+async function generatePortfolioUrls(): Promise<string> {
+  try {
+    const { data: portfolios, error } = await portfolioService.getPublishedPortfolios();
+    
+    if (error || !portfolios) {
+      console.error('Error fetching portfolios for sitemap:', error);
+      return '';
+    }
+
+    return portfolios.map(portfolio => `
+  <url>
+    <loc>${APP_CONFIG.url}/mypage/${portfolio.slug}</loc>
+    <lastmod>${new Date(portfolio.updated_at).toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('');
+  } catch (error) {
+    console.error('Error generating portfolio URLs:', error);
+    return '';
+  }
+}
+
+async function generateSitemapXML(): Promise<string> {
   const baseUrl = APP_CONFIG.url;
   const currentDate = new Date().toISOString();
 
@@ -51,19 +74,20 @@ function generateSitemapXML(): string {
   </url>`;
   }).join('');
 
-  // TODO: Add dynamic portfolio routes when implemented
-  // const portfolioUrls = await generatePortfolioUrls();
+  // Generate dynamic portfolio routes
+  const portfolioUrls = await generatePortfolioUrls();
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${staticUrls}
   ${authUrls}
+  ${portfolioUrls}
 </urlset>`;
 }
 
 export async function GET() {
   try {
-    const sitemap = generateSitemapXML();
+    const sitemap = await generateSitemapXML();
 
     return new NextResponse(sitemap, {
       headers: {
@@ -76,28 +100,3 @@ export async function GET() {
     return new NextResponse('Error generating sitemap', { status: 500 });
   }
 }
-
-// Optional: Function to generate dynamic portfolio URLs (for future implementation)
-// async function generatePortfolioUrls(): Promise<string> {
-//   try {
-//     // This would fetch portfolio data from Supabase
-//     // const { data: portfolios } = await supabase
-//     //   .from('portfolios')
-//     //   .select('slug, updated_at')
-//     //   .eq('status', 'published');
-
-//     // return portfolios?.map(portfolio => `
-//     //   <url>
-//     //     <loc>${APP_CONFIG.url}/mypage/${portfolio.slug}</loc>
-//     //     <lastmod>${new Date(portfolio.updated_at).toISOString()}</lastmod>
-//     //     <changefreq>monthly</changefreq>
-//     //     <priority>0.7</priority>
-//     //   </url>
-//     // `).join('') || '';
-
-//     return '';
-//   } catch (error) {
-//     console.error('Error generating portfolio URLs:', error);
-//     return '';
-//   }
-// }

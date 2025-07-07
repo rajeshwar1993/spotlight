@@ -472,11 +472,188 @@ export async function generateSlug(title: string, excludePortfolioId?: string): 
   return slug;
 }
 
+/**
+ * Get published portfolio by slug (public access)
+ */
+export async function getPublishedPortfolioBySlug(slug: string): Promise<PortfolioResponse> {
+  try {
+    const { data: portfolio, error } = await supabase
+      .from('portfolios')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'PUBLISHED')
+      .eq('is_published', true)
+      .single();
+
+    if (error) {
+      console.error('Error fetching published portfolio by slug:', error);
+      return { error: new Error(error.message) };
+    }
+
+    if (!portfolio) {
+      return { error: new Error('Portfolio not found') };
+    }
+
+    return { data: portfolio };
+  } catch (error) {
+    console.error('Error in getPublishedPortfolioBySlug:', error);
+    return { error: error as Error };
+  }
+}
+
+/**
+ * Get complete published portfolio data for public viewing
+ */
+export async function getPublishedPortfolioData(slug: string): Promise<PortfolioDataResponse> {
+  try {
+    // Get published portfolio
+    const { data: portfolio, error: portfolioError } = await getPublishedPortfolioBySlug(slug);
+    if (portfolioError || !portfolio) {
+      return { error: portfolioError || new Error('Portfolio not found') };
+    }
+
+    // Get user data
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', portfolio.user_id)
+      .single();
+
+    if (userError || !user) {
+      return { error: userError ? new Error(userError.message) : new Error('User not found') };
+    }
+
+    // Get portfolio images
+    const { data: images, error: imagesError } = await getPortfolioImages(portfolio.id);
+    if (imagesError) {
+      return { error: imagesError };
+    }
+
+    // Transform images by type
+    const imagesByType = {
+      profile: images?.find(img => img.type === 'PROFILE') || undefined,
+      hero: images?.find(img => img.type === 'HERO') || undefined,
+      gallery: images?.filter(img => img.type === 'GALLERY') || []
+    };
+
+    // Build portfolio data
+    const portfolioData: PortfolioData = {
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+        profession: user.profession,
+        location: user.location,
+        bio: user.bio,
+        avatar_url: user.avatar_url,
+        is_email_verified: user.is_email_verified,
+        is_profile_complete: user.is_profile_complete,
+        created_at: user.created_at,
+        updated_at: user.updated_at
+      },
+      portfolio: {
+        id: portfolio.id,
+        user_id: portfolio.user_id,
+        title: portfolio.title,
+        slug: portfolio.slug,
+        bio: portfolio.bio,
+        template: portfolio.template,
+        status: 'published',
+        is_published: portfolio.is_published,
+        height: portfolio.height,
+        weight: portfolio.weight,
+        eye_color: portfolio.eye_color,
+        hair_color: portfolio.hair_color,
+        skills: portfolio.skills,
+        experience_years: portfolio.experience_years || 0,
+        view_count: portfolio.view_count || 0,
+        created_at: portfolio.created_at,
+        updated_at: portfolio.updated_at
+      },
+      images: imagesByType,
+      social_links: {
+        instagram: user.social_instagram,
+        twitter: user.social_twitter,
+        linkedin: user.social_linkedin,
+        tiktok: user.social_tiktok,
+        website: user.website_url
+      },
+      contact_info: {
+        email: user.email,
+        phone: user.phone,
+        agent: undefined // TODO: Add agent support
+      },
+      stats: {
+        experience_years: calculateExperienceYears(user.date_of_birth),
+        projects_completed: imagesByType.gallery.length,
+        view_count: portfolio.view_count || 0
+      }
+    };
+
+    return { data: portfolioData };
+  } catch (error) {
+    console.error('Error in getPublishedPortfolioData:', error);
+    return { error: error as Error };
+  }
+}
+
+/**
+ * Get all published portfolios for sitemap generation
+ */
+export async function getPublishedPortfolios(): Promise<PortfolioListResponse> {
+  try {
+    const { data: portfolios, error } = await supabase
+      .from('portfolios')
+      .select('slug, updated_at, title')
+      .eq('status', 'PUBLISHED')
+      .eq('is_published', true)
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching published portfolios:', error);
+      return { error: new Error(error.message) };
+    }
+
+    return { data: portfolios || [] };
+  } catch (error) {
+    console.error('Error in getPublishedPortfolios:', error);
+    return { error: error as Error };
+  }
+}
+
+/**
+ * Increment portfolio view count
+ */
+export async function incrementPortfolioViewCount(portfolioId: string): Promise<{ error?: Error | null }> {
+  try {
+    const { error } = await supabase
+      .from('portfolios')
+      .update({ 
+        view_count: supabase.sql`COALESCE(view_count, 0) + 1`,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', portfolioId);
+
+    if (error) {
+      console.error('Error incrementing view count:', error);
+      return { error: new Error(error.message) };
+    }
+
+    return {};
+  } catch (error) {
+    console.error('Error in incrementPortfolioViewCount:', error);
+    return { error: error as Error };
+  }
+}
+
 // Portfolio service object for easier importing
 export const portfolioService = {
   getPortfolio,
   getUserPortfolios,
   getPortfolioBySlug,
+  getPublishedPortfolioBySlug,
+  getPublishedPortfolioData,
+  getPublishedPortfolios,
   createPortfolio,
   updatePortfolio,
   deletePortfolio,
@@ -485,6 +662,7 @@ export const portfolioService = {
   updatePortfolioImage,
   deletePortfolioImage,
   getPortfolioData,
+  incrementPortfolioViewCount,
   generateSlug,
   isSlugAvailable
 };
