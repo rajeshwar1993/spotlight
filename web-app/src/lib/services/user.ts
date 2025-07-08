@@ -328,3 +328,67 @@ export function getProfileCompletionDetails(user: User) {
   };
 }
 
+/**
+ * Update user with dynamic fields
+ */
+export async function updateUser(
+  updates: Record<string, unknown>
+): Promise<UserUpdateResponse> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { error: new Error('User not authenticated') };
+    }
+
+    // Transform social media fields
+    const transformedUpdates: Record<string, unknown> = {};
+    
+    for (const [key, value] of Object.entries(updates)) {
+      if (key === 'instagram_url') {
+        transformedUpdates.social_instagram = value;
+      } else if (key === 'linkedin_url') {
+        transformedUpdates.social_linkedin = value;
+      } else if (key === 'twitter_url') {
+        transformedUpdates.social_twitter = value;
+      } else if (key === 'website_url') {
+        transformedUpdates.website_url = value;
+      } else if (key === 'years_experience') {
+        transformedUpdates.years_experience = parseInt(value) || null;
+      } else {
+        transformedUpdates[key] = value;
+      }
+    }
+
+    transformedUpdates.updated_at = new Date().toISOString();
+
+    const { data: updatedUser, error } = await supabase
+      .from('users')
+      .update(transformedUpdates)
+      .eq('id', user.id)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Error updating user:', error);
+      return { error: new Error(error.message) };
+    }
+
+    return { data: updatedUser as User };
+  } catch (error) {
+    console.error('Error in updateUser:', error);
+    return { error: error as Error };
+  }
+}
+
+// Service object for easier importing
+export const userService = {
+  getUserProfile,
+  updateUserProfile,
+  updateUser,
+  uploadAvatar,
+  deleteAvatar,
+  calculateProfileCompletion,
+  isProfileComplete,
+  getProfileCompletionDetails,
+};
+

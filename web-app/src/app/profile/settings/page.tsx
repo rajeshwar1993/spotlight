@@ -6,13 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProtectedRoute } from '@/components/auth/protected-route';
+import { PrivacySettings } from '@/components/profile/privacy-settings';
 import { useAuth } from '@/hooks/use-auth';
 import { useUser } from '@/hooks/use-user';
+import { Download, FileText, BarChart } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfileSettingsPage() {
+  const [activeTab, setActiveTab] = useState<'account' | 'privacy' | 'data'>('account');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [isExportingData, setIsExportingData] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -108,6 +112,66 @@ export default function ProfileSettingsPage() {
     router.push('/');
   };
 
+  const handleDataExport = async () => {
+    setIsExportingData(true);
+    setMessage(null);
+
+    try {
+      // Fetch user data and portfolios
+      const [userResponse, portfoliosResponse] = await Promise.all([
+        fetch('/api/user/profile'),
+        fetch('/api/portfolios')
+      ]);
+
+      if (!userResponse.ok || !portfoliosResponse.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const userData = await userResponse.json();
+      const portfoliosData = await portfoliosResponse.json();
+
+      // Create export data
+      const exportData = {
+        user: userData.user,
+        portfolios: portfoliosData.data || [],
+        export_date: new Date().toISOString(),
+        export_type: 'complete_profile_data'
+      };
+
+      // Create and download JSON file
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `spotlight-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setMessage({
+        type: 'success',
+        text: 'Data export completed successfully! Check your downloads.',
+      });
+    } catch (error) {
+      console.error('Data export failed:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to export data. Please try again.',
+      });
+    } finally {
+      setIsExportingData(false);
+    }
+  };
+
+  const tabs = [
+    { id: 'account' as const, label: 'Account', icon: '👤' },
+    { id: 'privacy' as const, label: 'Privacy', icon: '🔒' },
+    { id: 'data' as const, label: 'Data & Export', icon: '📁' },
+  ];
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -124,6 +188,12 @@ export default function ProfileSettingsPage() {
                 </p>
               </div>
               <div className="flex space-x-3">
+                <Link href="/profile/dashboard">
+                  <Button variant="outline">
+                    <BarChart className="h-4 w-4 mr-2" />
+                    Profile Dashboard
+                  </Button>
+                </Link>
                 <Link href="/profile">
                   <Button variant="outline">
                     Back to Profile
@@ -136,6 +206,26 @@ export default function ProfileSettingsPage() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="mb-8">
+            <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
           </div>
 
           {/* Status Message */}
@@ -156,8 +246,10 @@ export default function ProfileSettingsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Account Information */}
-              <Card>
+              {activeTab === 'account' && (
+                <>
+                  {/* Account Information */}
+                  <Card>
                 <CardHeader>
                   <CardTitle>Account Information</CardTitle>
                   <CardDescription>
@@ -345,6 +437,142 @@ export default function ProfileSettingsPage() {
                   </div>
                 </CardContent>
               </Card>
+                </>
+              )}
+
+              {activeTab === 'privacy' && (
+                <PrivacySettings 
+                  onSettingsChange={(settings) => {
+                    console.log('Privacy settings updated:', settings);
+                    setMessage({
+                      type: 'success',
+                      text: 'Privacy settings updated successfully!'
+                    });
+                  }}
+                />
+              )}
+
+              {activeTab === 'data' && (
+                <>
+                  {/* Data Export */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Download className="h-5 w-5 mr-2" />
+                        Data Export
+                      </CardTitle>
+                      <CardDescription>
+                        Download a copy of your personal data and portfolio information
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2 flex items-center">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Complete Profile Data
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Exports all your profile information, portfolios, and settings in JSON format.
+                        </p>
+                        <Button
+                          onClick={handleDataExport}
+                          disabled={isExportingData}
+                          className="w-full sm:w-auto"
+                        >
+                          {isExportingData ? (
+                            <>
+                              <Download className="h-4 w-4 mr-2 animate-spin" />
+                              Exporting...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-4 w-4 mr-2" />
+                              Export Data
+                            </>
+                          )}
+                        </Button>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Portfolio Images</h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Download all your uploaded portfolio images as a ZIP file.
+                        </p>
+                        <Button variant="outline" disabled className="w-full sm:w-auto">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export Images (Coming Soon)
+                        </Button>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Analytics Data</h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Export your portfolio view statistics and performance metrics.
+                        </p>
+                        <Button variant="outline" disabled className="w-full sm:w-auto">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export Analytics (Coming Soon)
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Activity History */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Activity History</CardTitle>
+                      <CardDescription>
+                        View and export your account activity history
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center py-8">
+                        <div className="text-gray-400 mb-2">
+                          <FileText className="h-12 w-12 mx-auto" />
+                        </div>
+                        <p className="text-gray-600 mb-4">Activity tracking is not yet available</p>
+                        <Button variant="outline" disabled>
+                          View Activity Log (Coming Soon)
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Account Deletion */}
+                  <Card className="border-red-200">
+                    <CardHeader>
+                      <CardTitle className="text-red-700">Delete Account</CardTitle>
+                      <CardDescription>
+                        Permanently delete your account and all associated data
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="border border-red-200 rounded-lg p-4">
+                        <h4 className="font-medium text-red-700 mb-2">⚠️ This action cannot be undone</h4>
+                        <p className="text-sm text-gray-600 mb-4">
+                          Deleting your account will permanently remove:
+                        </p>
+                        <ul className="text-sm text-gray-600 mb-4 space-y-1">
+                          <li>• Your profile and all personal information</li>
+                          <li>• All portfolios and uploaded images</li>
+                          <li>• Portfolio view statistics and analytics</li>
+                          <li>• All associated data and settings</li>
+                        </ul>
+                        <p className="text-sm text-gray-600 mb-4">
+                          We recommend exporting your data before deletion if you want to keep a copy.
+                        </p>
+                        <Button
+                          variant="destructive"
+                          disabled
+                          className="w-full sm:w-auto"
+                        >
+                          Delete My Account (Coming Soon)
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
             </div>
 
             {/* Sidebar */}
