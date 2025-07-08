@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { ProfileCompletion } from '@/components/ui/profile-completion';
 import { EmailVerificationBanner } from '@/components/email-verification/verification-banner';
 import { emailVerificationService } from '@/lib/services/email-verification';
+import { useAdmin } from '@/components/admin/admin-guard';
 import { useState, useEffect } from 'react';
-import { Plus, Eye, Grid, ExternalLink } from 'lucide-react';
+import { Plus, Eye, Grid, ExternalLink, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 interface Portfolio {
@@ -34,6 +35,7 @@ interface PortfolioStats {
 export default function DashboardPage() {
   const { user, loading, isAuthenticated } = useUser();
   const { signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [portfolioStats, setPortfolioStats] = useState<PortfolioStats>({
     total: 0,
@@ -199,7 +201,7 @@ export default function DashboardPage() {
                 {/* Quick Actions */}
                 <div className="mt-6 pt-6 border-t">
                   <h3 className="text-lg font-medium mb-4">Quick Actions</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className={`grid grid-cols-2 gap-3 ${isAdmin ? 'md:grid-cols-3' : 'md:grid-cols-4'}`}>
                     <Link href="/profile" className="block">
                       <Button variant="outline" className="w-full justify-start">
                         <span className="mr-2">👤</span>
@@ -224,6 +226,14 @@ export default function DashboardPage() {
                         Create Portfolio
                       </Button>
                     </Link>
+                    {isAdmin && (
+                      <Link href="/admin" className="block">
+                        <Button variant="outline" className="w-full justify-start">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Admin
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </CardContent>
