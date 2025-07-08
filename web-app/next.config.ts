@@ -1,7 +1,13 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import bundleAnalyzer from '@next/bundle-analyzer';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: true,
+});
 
 const nextConfig: NextConfig = {
   // Enable experimental features for better performance
@@ -43,12 +49,15 @@ const nextConfig: NextConfig = {
   // Optimize for production builds
   productionBrowserSourceMaps: false,
   
-  // Optimize bundle analysis
+  // Enhanced bundle optimization
   webpack: (config, { dev, isServer }) => {
     // Optimize for production
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         ...config.optimization.splitChunks,
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 244000,
         cacheGroups: {
           ...config.optimization.splitChunks.cacheGroups,
           // Create separate chunk for portfolio templates
@@ -56,14 +65,42 @@ const nextConfig: NextConfig = {
             name: 'templates',
             chunks: 'all',
             test: /[\\/]templates[\\/]/,
-            priority: 20,
+            priority: 30,
+            enforce: true,
           },
           // Create separate chunk for UI components
           ui: {
             name: 'ui',
             chunks: 'all',
             test: /[\\/]components[\\/]ui[\\/]/,
+            priority: 25,
+            enforce: true,
+          },
+          // Create separate chunk for admin components
+          admin: {
+            name: 'admin',
+            chunks: 'all',
+            test: /[\\/]admin[\\/]/,
+            priority: 20,
+            enforce: true,
+          },
+          // Create separate chunk for dashboard components
+          dashboard: {
+            name: 'dashboard',
+            chunks: 'all',
+            test: /[\\/]dashboard[\\/]/,
             priority: 15,
+            enforce: true,
+          },
+          // Vendor chunk for large third-party packages
+          vendor: {
+            name: 'vendor',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+            minChunks: 1,
+            maxInitialRequests: 25,
+            minSize: 20000,
           },
         },
       };
@@ -145,4 +182,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withBundleAnalyzer(withNextIntl(nextConfig));

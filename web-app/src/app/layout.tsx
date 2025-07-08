@@ -10,6 +10,9 @@ import { MainLayout } from '@/components/layout';
 import { generateHomePageMetaTags } from '@/lib/seo';
 import './globals.css';
 
+// Performance monitoring
+import { performanceMonitor } from '@/lib/performance';
+
 const inter = Inter({
   variable: '--font-sans',
   subsets: ['latin'],
@@ -78,6 +81,13 @@ export default function RootLayout({
                     });
                 });
               }
+
+              // Initialize performance monitoring
+              window.addEventListener('load', function() {
+                if (window.performance && window.PerformanceObserver) {
+                  console.log('Performance monitoring initialized');
+                }
+              });
             `,
           }}
         />

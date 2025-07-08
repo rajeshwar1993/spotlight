@@ -1,0 +1,189 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  performance-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'web-app/package-lock.json'
+    
+    - name: Install dependencies
+      run: |
+        cd web-app
+        npm ci
+    
+    - name: Build application
+      run: |
+        cd web-app
+        npm run build
+    
+    - name: Analyze bundle size
+      run: |
+        cd web-app
+        npm run build:analyze
+    
+    - name: Bundle size check
+      uses: andresz1/size-limit-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        build_script: |
+          cd web-app
+          npm run build
+        directory: web-app
+    
+    - name: Performance audit with Lighthouse
+      uses: treosh/lighthouse-ci-action@v9
+      with:
+        configPath: './web-app/lighthouse.json'
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+    
+    - name: Upload bundle analysis
+      uses: actions/upload-artifact@v3
+      with:
+        name: bundle-analysis
+        path: |
+          web-app/bundle-report.html
+          web-app/bundle-stats.json
+        retention-days: 30
+    
+    - name: Performance regression check
+      id: performance-check
+      run: |
+        cd web-app
+        node scripts/performance-check.js
+    
+    - name: Comment PR with performance results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          try {
+            const reportPath = path.join('web-app', 'performance-report.json');
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            
+            const comment = `
+            ## 📊 Performance Report
+            
+            ### Bundle Size Analysis
+            - **Total Size**: ${report.bundleSize.total}
+            - **Gzipped Size**: ${report.bundleSize.gzipped}
+            - **Change**: ${report.bundleSize.change}
+            
+            ### Core Web Vitals
+            - **Performance Score**: ${report.lighthouse.performance}
+            - **First Contentful Paint**: ${report.lighthouse.fcp}
+            - **Largest Contentful Paint**: ${report.lighthouse.lcp}
+            - **Cumulative Layout Shift**: ${report.lighthouse.cls}
+            
+            ### Recommendations
+            ${report.recommendations.map(rec => `- ${rec}`).join('\n')}
+            
+            [View detailed report](${report.detailedReportUrl})
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } catch (error) {
+            console.error('Error creating performance comment:', error);
+          }
+
+  benchmark:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'web-app/package-lock.json'
+    
+    - name: Install dependencies
+      run: |
+        cd web-app
+        npm ci
+    
+    - name: Build application
+      run: |
+        cd web-app
+        npm run build
+    
+    - name: Start application
+      run: |
+        cd web-app
+        npm start &
+        sleep 10
+    
+    - name: Run performance benchmarks
+      run: |
+        cd web-app
+        npm run perf:benchmark
+    
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'customSmallerIsBetter'
+        output-file-path: web-app/benchmark-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        comment-on-alert: true
+        alert-threshold: '200%'
+        fail-on-alert: true
+
+  size-limit:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'web-app/package-lock.json'
+    
+    - name: Install dependencies
+      run: |
+        cd web-app
+        npm ci
+    
+    - name: Check bundle size limits
+      run: |
+        cd web-app
+        npx size-limit
+    
+    - name: Bundle size tracking
+      uses: andresz1/size-limit-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        build_script: |
+          cd web-app
+          npm run build
+        directory: web-app
+        skip_step: install
