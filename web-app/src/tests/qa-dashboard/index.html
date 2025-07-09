@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Dashboard - Spotlight</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 1rem;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .status-warning {
+            background: #fed7aa;
+            color: #c05621;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .status-info {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            transition: width 0.3s ease;
+        }
+
+        .test-results {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .test-results h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .test-suite {
+            margin-bottom: 2rem;
+        }
+
+        .test-suite-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .test-suite-header:hover {
+            background: #edf2f7;
+        }
+
+        .test-suite-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .test-list {
+            display: none;
+            padding-left: 1rem;
+        }
+
+        .test-list.expanded {
+            display: block;
+        }
+
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-left: 3px solid transparent;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .test-item:hover {
+            background: #f7fafc;
+        }
+
+        .test-item.passed {
+            border-left-color: #48bb78;
+        }
+
+        .test-item.failed {
+            border-left-color: #f56565;
+        }
+
+        .test-item.skipped {
+            border-left-color: #ed8936;
+        }
+
+        .test-name {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .test-duration {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: #f7fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            color: #4a5568;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-select:hover {
+            border-color: #cbd5e0;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .refresh-button {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .refresh-button:hover {
+            background: #5a67d8;
+        }
+
+        .timestamp {
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+
+        .security-scan {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .security-scan h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .vulnerability-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-left: 4px solid;
+            margin-bottom: 1rem;
+            background: #f7fafc;
+            border-radius: 4px;
+        }
+
+        .vulnerability-item.critical {
+            border-left-color: #e53e3e;
+            background: #fed7d7;
+        }
+
+        .vulnerability-item.high {
+            border-left-color: #dd6b20;
+            background: #feebc8;
+        }
+
+        .vulnerability-item.medium {
+            border-left-color: #d69e2e;
+            background: #faf089;
+        }
+
+        .vulnerability-item.low {
+            border-left-color: #38a169;
+            background: #c6f6d5;
+        }
+
+        .vulnerability-info {
+            flex: 1;
+        }
+
+        .vulnerability-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .vulnerability-description {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .performance-metrics {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .performance-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .performance-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .performance-label {
+            color: #718096;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .performance-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Quality Assurance Dashboard</h1>
+        <p>Comprehensive testing and quality metrics for Spotlight</p>
+    </div>
+
+    <div class="container">
+        <div class="filters">
+            <select class="filter-select" id="testSuiteFilter">
+                <option value="all">All Test Suites</option>
+                <option value="unit">Unit Tests</option>
+                <option value="integration">Integration Tests</option>
+                <option value="e2e">E2E Tests</option>
+                <option value="security">Security Tests</option>
+                <option value="performance">Performance Tests</option>
+            </select>
+
+            <select class="filter-select" id="browserFilter">
+                <option value="all">All Browsers</option>
+                <option value="chromium">Chromium</option>
+                <option value="firefox">Firefox</option>
+                <option value="webkit">WebKit</option>
+                <option value="edge">Edge</option>
+            </select>
+
+            <select class="filter-select" id="timeFilter">
+                <option value="24h">Last 24 Hours</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+                <option value="90d">Last 90 Days</option>
+            </select>
+
+            <button class="refresh-button" onclick="refreshDashboard()">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: #48bb78;">✓</div>
+                    <div class="card-title">Test Results</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Total Tests</span>
+                    <span class="metric-value" id="totalTests">847</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Passed</span>
+                    <span class="metric-value" style="color: #48bb78;" id="passedTests">821</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Failed</span>
+                    <span class="metric-value" style="color: #f56565;" id="failedTests">12</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Skipped</span>
+                    <span class="metric-value" style="color: #ed8936;" id="skippedTests">14</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="testProgress" style="width: 97%;"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: #667eea;">🔒</div>
+                    <div class="card-title">Security Scan</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Security Score</span>
+                    <span class="metric-value" style="color: #48bb78;" id="securityScore">85/100</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Critical Issues</span>
+                    <span class="metric-value" style="color: #f56565;" id="criticalIssues">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">High Issues</span>
+                    <span class="metric-value" style="color: #ed8936;" id="highIssues">2</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Medium Issues</span>
+                    <span class="metric-value" style="color: #d69e2e;" id="mediumIssues">5</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: #ed8936;">⚡</div>
+                    <div class="card-title">Performance</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Lighthouse Score</span>
+                    <span class="metric-value" style="color: #48bb78;" id="lighthouseScore">92</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Load Time</span>
+                    <span class="metric-value" id="loadTime">1.2s</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">FCP</span>
+                    <span class="metric-value" id="fcp">0.8s</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">LCP</span>
+                    <span class="metric-value" id="lcp">1.5s</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: #9f7aea;">📊</div>
+                    <div class="card-title">Coverage</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Code Coverage</span>
+                    <span class="metric-value" style="color: #48bb78;" id="codeCoverage">89%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Branch Coverage</span>
+                    <span class="metric-value" id="branchCoverage">82%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Function Coverage</span>
+                    <span class="metric-value" id="functionCoverage">94%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Line Coverage</span>
+                    <span class="metric-value" id="lineCoverage">87%</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: #f56565;">🐛</div>
+                    <div class="card-title">Bug Report</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Open Issues</span>
+                    <span class="metric-value" style="color: #f56565;" id="openIssues">23</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Critical Bugs</span>
+                    <span class="metric-value" style="color: #e53e3e;" id="criticalBugs">1</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">High Priority</span>
+                    <span class="metric-value" style="color: #dd6b20;" id="highPriorityBugs">4</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Resolved Today</span>
+                    <span class="metric-value" style="color: #48bb78;" id="resolvedToday">7</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: #38b2ac;">🌐</div>
+                    <div class="card-title">Cross-Browser</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Chrome</span>
+                    <span class="status-badge status-success">Passing</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Firefox</span>
+                    <span class="status-badge status-success">Passing</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Safari</span>
+                    <span class="status-badge status-warning">Warning</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Edge</span>
+                    <span class="status-badge status-success">Passing</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-title">Test Results Trend</div>
+                <div class="chart-placeholder">
+                    📈 Test results over time chart would be displayed here
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Performance Metrics</div>
+                <div class="chart-placeholder">
+                    📊 Performance metrics chart would be displayed here
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Security Vulnerabilities</div>
+                <div class="chart-placeholder">
+                    🔍 Security scan results chart would be displayed here
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Code Coverage</div>
+                <div class="chart-placeholder">
+                    📋 Code coverage breakdown chart would be displayed here
+                </div>
+            </div>
+        </div>
+
+        <div class="performance-metrics">
+            <h2>Core Web Vitals</h2>
+            <div class="performance-grid">
+                <div class="performance-item">
+                    <div class="performance-value" style="color: #48bb78;">0.8s</div>
+                    <div class="performance-label">First Contentful Paint</div>
+                </div>
+                <div class="performance-item">
+                    <div class="performance-value" style="color: #48bb78;">1.2s</div>
+                    <div class="performance-label">Largest Contentful Paint</div>
+                </div>
+                <div class="performance-item">
+                    <div class="performance-value" style="color: #48bb78;">0.05</div>
+                    <div class="performance-label">Cumulative Layout Shift</div>
+                </div>
+                <div class="performance-item">
+                    <div class="performance-value" style="color: #48bb78;">85ms</div>
+                    <div class="performance-label">First Input Delay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="security-scan">
+            <h2>Security Vulnerabilities</h2>
+            <div class="vulnerability-item medium">
+                <div class="vulnerability-info">
+                    <div class="vulnerability-title">Missing Content Security Policy</div>
+                    <div class="vulnerability-description">CSP header not properly configured for all routes</div>
+                </div>
+                <span class="status-badge status-warning">Medium</span>
+            </div>
+            <div class="vulnerability-item high">
+                <div class="vulnerability-info">
+                    <div class="vulnerability-title">Insecure Cookie Settings</div>
+                    <div class="vulnerability-description">Session cookies missing secure and httpOnly flags</div>
+                </div>
+                <span class="status-badge status-error">High</span>
+            </div>
+            <div class="vulnerability-item low">
+                <div class="vulnerability-info">
+                    <div class="vulnerability-title">Missing X-Frame-Options</div>
+                    <div class="vulnerability-description">Header missing on some endpoints</div>
+                </div>
+                <span class="status-badge status-info">Low</span>
+            </div>
+        </div>
+
+        <div class="test-results">
+            <h2>Test Suite Results</h2>
+            
+            <div class="test-suite">
+                <div class="test-suite-header" onclick="toggleTestSuite(this)">
+                    <span class="test-suite-title">🧪 Unit Tests</span>
+                    <span class="status-badge status-success">245 / 250 Passed</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item passed">
+                        <span class="test-name">Component rendering tests</span>
+                        <span class="test-duration">1.2s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">Utility function tests</span>
+                        <span class="test-duration">0.8s</span>
+                    </div>
+                    <div class="test-item failed">
+                        <span class="test-name">Authentication flow tests</span>
+                        <span class="test-duration">2.1s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">Form validation tests</span>
+                        <span class="test-duration">1.5s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-suite">
+                <div class="test-suite-header" onclick="toggleTestSuite(this)">
+                    <span class="test-suite-title">🔗 Integration Tests</span>
+                    <span class="status-badge status-success">89 / 92 Passed</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item passed">
+                        <span class="test-name">API endpoint tests</span>
+                        <span class="test-duration">3.2s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">Database integration tests</span>
+                        <span class="test-duration">2.8s</span>
+                    </div>
+                    <div class="test-item failed">
+                        <span class="test-name">Email service tests</span>
+                        <span class="test-duration">1.9s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-suite">
+                <div class="test-suite-header" onclick="toggleTestSuite(this)">
+                    <span class="test-suite-title">🌐 End-to-End Tests</span>
+                    <span class="status-badge status-warning">156 / 162 Passed</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item passed">
+                        <span class="test-name">Portfolio creation flow</span>
+                        <span class="test-duration">12.3s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">User authentication flow</span>
+                        <span class="test-duration">8.7s</span>
+                    </div>
+                    <div class="test-item failed">
+                        <span class="test-name">Image upload functionality</span>
+                        <span class="test-duration">15.2s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">Dashboard navigation</span>
+                        <span class="test-duration">6.4s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-suite">
+                <div class="test-suite-header" onclick="toggleTestSuite(this)">
+                    <span class="test-suite-title">🔒 Security Tests</span>
+                    <span class="status-badge status-success">78 / 82 Passed</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item passed">
+                        <span class="test-name">XSS vulnerability tests</span>
+                        <span class="test-duration">4.1s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">CSRF protection tests</span>
+                        <span class="test-duration">3.8s</span>
+                    </div>
+                    <div class="test-item failed">
+                        <span class="test-name">SQL injection tests</span>
+                        <span class="test-duration">2.7s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">Authentication security</span>
+                        <span class="test-duration">5.3s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-suite">
+                <div class="test-suite-header" onclick="toggleTestSuite(this)">
+                    <span class="test-suite-title">⚡ Performance Tests</span>
+                    <span class="status-badge status-success">67 / 69 Passed</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item passed">
+                        <span class="test-name">Page load performance</span>
+                        <span class="test-duration">8.9s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">Memory usage tests</span>
+                        <span class="test-duration">6.2s</span>
+                    </div>
+                    <div class="test-item failed">
+                        <span class="test-name">Load testing under stress</span>
+                        <span class="test-duration">45.7s</span>
+                    </div>
+                    <div class="test-item passed">
+                        <span class="test-name">Bundle size analysis</span>
+                        <span class="test-duration">3.4s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            Last updated: <span id="lastUpdated">2024-01-20 14:30:25 UTC</span>
+        </div>
+    </div>
+
+    <script>
+        function toggleTestSuite(element) {
+            const testList = element.nextElementSibling;
+            testList.classList.toggle('expanded');
+            
+            const icon = testList.classList.contains('expanded') ? '▼' : '▶';
+            element.querySelector('.test-suite-title').textContent = 
+                element.querySelector('.test-suite-title').textContent.replace(/[▼▶]/, icon);
+        }
+
+        function refreshDashboard() {
+            // Simulate refresh
+            const refreshButton = document.querySelector('.refresh-button');
+            refreshButton.textContent = '🔄 Refreshing...';
+            refreshButton.disabled = true;
+            
+            setTimeout(() => {
+                refreshButton.textContent = '🔄 Refresh';
+                refreshButton.disabled = false;
+                document.getElementById('lastUpdated').textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+            }, 2000);
+        }
+
+        // Simulate real-time updates
+        function updateMetrics() {
+            const metrics = [
+                { id: 'totalTests', min: 840, max: 850 },
+                { id: 'passedTests', min: 815, max: 825 },
+                { id: 'failedTests', min: 10, max: 15 },
+                { id: 'skippedTests', min: 12, max: 18 },
+                { id: 'securityScore', min: 80, max: 90 },
+                { id: 'lighthouseScore', min: 88, max: 95 },
+                { id: 'criticalIssues', min: 0, max: 2 },
+                { id: 'highIssues', min: 1, max: 5 }
+            ];
+
+            metrics.forEach(metric => {
+                const element = document.getElementById(metric.id);
+                if (element) {
+                    const currentValue = parseInt(element.textContent);
+                    const newValue = Math.max(metric.min, Math.min(metric.max, 
+                        currentValue + Math.floor(Math.random() * 3) - 1));
+                    element.textContent = newValue + (metric.id.includes('Score') ? '/100' : '');
+                }
+            });
+
+            // Update progress bar
+            const passedTests = parseInt(document.getElementById('passedTests').textContent);
+            const totalTests = parseInt(document.getElementById('totalTests').textContent);
+            const percentage = Math.round((passedTests / totalTests) * 100);
+            document.getElementById('testProgress').style.width = percentage + '%';
+        }
+
+        // Update metrics every 30 seconds
+        setInterval(updateMetrics, 30000);
+
+        // Auto-refresh timestamp every minute
+        setInterval(() => {
+            document.getElementById('lastUpdated').textContent = 
+                new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+        }, 60000);
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('QA Dashboard initialized');
+            updateMetrics();
+        });
+    </script>
+</body>
+</html>
