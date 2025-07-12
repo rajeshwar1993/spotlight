@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+// Removed framer-motion dependency - using CSS animations instead
 import { Check, Circle } from 'lucide-react';
 
 interface ProgressTrackerProps {
@@ -32,7 +32,7 @@ export function ProgressTracker({
       {/* Progress Bar */}
       <div className="relative mb-8">
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <motion.div
+          <div
             className="h-full bg-gradient-to-r from-spotlight-500 to-spotlight-600 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercentage}%` }}
@@ -57,7 +57,7 @@ export function ProgressTracker({
           return (
             <div key={index} className="flex items-center">
               {/* Step Circle */}
-              <motion.div
+              <div
                 className={`
                   relative w-10 h-10 rounded-full flex items-center justify-center
                   transition-all duration-300 border-2
@@ -78,20 +78,20 @@ export function ProgressTracker({
                 transition={{ duration: 0.3 }}
               >
                 {isCompleted ? (
-                  <motion.div
+                  <div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2 }}
                   >
                     <Check className="h-5 w-5" />
-                  </motion.div>
+                  </div>
                 ) : (
                   <span className="text-sm font-medium">{index + 1}</span>
                 )}
                 
                 {/* Current step pulse effect */}
                 {isCurrent && (
-                  <motion.div
+                  <div
                     className="absolute inset-0 rounded-full border-2 border-spotlight-600"
                     animate={{
                       scale: [1, 1.2, 1],
@@ -104,11 +104,11 @@ export function ProgressTracker({
                     }}
                   />
                 )}
-              </motion.div>
+              </div>
 
               {/* Step Label */}
               <div className="ml-3 min-w-0 flex-1">
-                <motion.p
+                <p
                   className={`
                     text-sm font-medium transition-colors
                     ${
@@ -127,7 +127,7 @@ export function ProgressTracker({
                   transition={{ duration: 0.3 }}
                 >
                   {stepNames[index]}
-                </motion.p>
+                </p>
                 
                 {/* Step Status */}
                 <p className={`
@@ -156,7 +156,7 @@ export function ProgressTracker({
                 <div className="flex-1 mx-4">
                   <div className="relative">
                     <div className="h-0.5 bg-gray-200 w-full" />
-                    <motion.div
+                    <div
                       className="h-0.5 bg-spotlight-600 absolute top-0 left-0"
                       initial={{ width: '0%' }}
                       animate={{ 
@@ -173,7 +173,7 @@ export function ProgressTracker({
       </div>
 
       {/* Motivational Message */}
-      <motion.div
+      <div
         className="mt-6 text-center"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -209,10 +209,10 @@ export function ProgressTracker({
             🎉 Congratulations! You're all set up and ready to go
           </p>
         )}
-      </motion.div>
+      </div>
 
       {/* Time Estimate */}
-      <motion.div
+      <div
         className="mt-4 text-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -224,7 +224,7 @@ export function ProgressTracker({
             {totalSteps - currentStep - 1} steps remaining • ~{(totalSteps - currentStep - 1) * 1} minute{totalSteps - currentStep - 1 !== 1 ? 's' : ''}
           </span>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

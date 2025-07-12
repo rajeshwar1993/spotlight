@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// Removed framer-motion dependency - using CSS animations instead
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -205,7 +205,7 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header */}
-      <motion.div
+      <div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
@@ -217,7 +217,7 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
           Discover the tools and features that will help you create an outstanding portfolio 
           and land more bookings.
         </p>
-      </motion.div>
+      </div>
 
       {/* Progress */}
       <div className="mb-8">
@@ -226,11 +226,9 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
           <span>{Math.round(progress)}% explored</span>
         </div>
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-gradient-to-r from-spotlight-500 to-spotlight-600"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5 }}
+          <div
+            className="h-full bg-gradient-to-r from-spotlight-500 to-spotlight-600 transition-all duration-500"
+            style={{ width: `${progress}%` }}
           />
         </div>
       </div>
@@ -241,18 +239,16 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
           <h3 className="text-lg font-semibold mb-4">All Features</h3>
           <div className="space-y-2">
             {FEATURES.map((feat, index) => (
-              <motion.button
+              <button
                 key={feat.id}
                 onClick={() => handleFeatureSelect(index)}
                 className={`
-                  w-full text-left p-3 rounded-lg transition-all
+                  w-full text-left p-3 rounded-lg transition-all hover:scale-105 active:scale-95
                   ${index === currentFeature 
                     ? 'bg-spotlight-100 border-2 border-spotlight-300' 
                     : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
                   }
                 `}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
               >
                 <div className="flex items-center space-x-3">
                   <div className={`
@@ -271,7 +267,7 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
                     <Check className="h-4 w-4 text-green-600" />
                   )}
                 </div>
-              </motion.button>
+              </button>
             ))}
           </div>
 
@@ -298,7 +294,7 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
         {/* Feature Detail */}
         <div className="lg:col-span-2">
           <AnimatePresence mode="wait">
-            <motion.div
+            <div
               key={currentFeature}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -352,7 +348,7 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
                     <h4 className="font-semibold mb-3">Key Benefits</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {feature.highlights.map((highlight, index) => (
-                        <motion.div
+                        <div
                           key={highlight}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -361,13 +357,13 @@ export function FeatureHighlights({ onComplete, onBack }: FeatureHighlightsProps
                         >
                           <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
                           <span className="text-sm">{highlight}</span>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </AnimatePresence>
 
           {/* Navigation */}

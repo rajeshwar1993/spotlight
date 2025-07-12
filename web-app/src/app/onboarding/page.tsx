@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/auth/auth-context';
+import { useAuth } from '@/contexts/auth-context';
 import { WelcomeWizard } from '@/components/onboarding/welcome-wizard';
 import { ProgressTracker } from '@/components/onboarding/progress-tracker';
 import { FeatureHighlights } from '@/components/onboarding/feature-highlights';

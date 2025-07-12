@@ -1,6 +1,15 @@
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+// Conditionally import Vercel analytics
+let Analytics: any = null;
+let SpeedInsights: any = null;
+
+try {
+  Analytics = require('@vercel/analytics/react').Analytics;
+  SpeedInsights = require('@vercel/speed-insights/next').SpeedInsights;
+} catch (e) {
+  // Vercel analytics not installed
+}
 import { config } from '../config/env-validation';
+import React from 'react';
 
 /**
  * Analytics configuration
@@ -403,8 +412,8 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   return (
     <>
       {children}
-      {analyticsConfig.vercel.enabled && <Analytics />}
-      {analyticsConfig.vercel.enabled && <SpeedInsights />}
+      {analyticsConfig.vercel.enabled && Analytics && <Analytics />}
+      {analyticsConfig.vercel.enabled && SpeedInsights && <SpeedInsights />}
     </>
   );
 };

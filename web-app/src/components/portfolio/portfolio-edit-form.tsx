@@ -332,7 +332,7 @@ export function PortfolioEditForm({
                     <Input
                       id="height"
                       {...form.register('height')}
-                      placeholder="e.g., 5'8\" or 173cm"
+                      placeholder="e.g., 5'8&quot; or 173cm"
                     />
                   </div>
 

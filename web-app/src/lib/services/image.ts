@@ -508,12 +508,80 @@ export async function setPrimaryImage(
  * Get optimized image URLs (for future use with image transformations)
  */
 export function getOptimizedImageUrls(originalUrl: string): OptimizedImageUrls {
-  // For now, return the same URL for all sizes
-  // This can be enhanced with Supabase image transformations or a CDN
+  // Check if this is a Supabase storage URL
+  const isSupabaseUrl = originalUrl.includes('supabase.co/storage/v1/object/public');
+  
+  if (isSupabaseUrl) {
+    // Supabase supports image transformations via query parameters
+    const baseUrl = originalUrl.split('?')[0]; // Remove existing query params
+    return {
+      original: originalUrl,
+      thumbnail: `${baseUrl}?width=150&height=150&resize=cover&quality=80`,
+      medium: `${baseUrl}?width=500&height=500&resize=cover&quality=85`,
+      large: `${baseUrl}?width=1200&height=1200&resize=cover&quality=90`,
+    };
+  }
+  
+  // For non-Supabase URLs, return the same URL for all sizes
+  // This can be enhanced with other CDN services if needed
   return {
     original: originalUrl,
-    thumbnail: originalUrl, // TODO: Add ?width=150&height=150
-    medium: originalUrl,    // TODO: Add ?width=500&height=500
-    large: originalUrl,     // TODO: Add ?width=1200&height=1200
+    thumbnail: originalUrl,
+    medium: originalUrl,
+    large: originalUrl,
   };
+}
+
+/**
+ * Duplicate images from one portfolio to another
+ */
+export async function duplicatePortfolioImages(
+  sourcePortfolioId: string,
+  targetPortfolioId: string,
+  targetUserId: string
+): Promise<{ error?: Error | null }> {
+  try {
+    // Get all images from source portfolio
+    const { data: sourceImages, error: fetchError } = await supabase
+      .from('images')
+      .select('*')
+      .eq('portfolio_id', sourcePortfolioId);
+
+    if (fetchError) {
+      return { error: new Error(fetchError.message) };
+    }
+
+    if (!sourceImages || sourceImages.length === 0) {
+      return {}; // No images to duplicate
+    }
+
+    // Create new image records for the target portfolio
+    const duplicatedImages = sourceImages.map(image => ({
+      user_id: targetUserId,
+      portfolio_id: targetPortfolioId,
+      type: image.type,
+      file_name: image.file_name,
+      file_path: image.file_path, // Using the same file path (shared storage)
+      file_size: image.file_size,
+      width: image.width,
+      height: image.height,
+      alt_text: image.alt_text,
+      is_primary: image.is_primary,
+      sort_order: image.sort_order,
+      // created_at and updated_at will be set automatically
+    }));
+
+    // Insert the duplicated image records
+    const { error: insertError } = await supabase
+      .from('images')
+      .insert(duplicatedImages);
+
+    if (insertError) {
+      return { error: new Error(insertError.message) };
+    }
+
+    return {};
+  } catch (error) {
+    return { error: error as Error };
+  }
 }

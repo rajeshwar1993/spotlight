@@ -1,4 +1,10 @@
-import * as Sentry from '@sentry/nextjs';
+// Conditionally import Sentry
+let Sentry: any = null;
+try {
+  Sentry = require('@sentry/nextjs');
+} catch (e) {
+  // Sentry not installed
+}
 import { config } from '../config/env-validation';
 
 /**
@@ -95,8 +101,10 @@ export function initializeSentry() {
   }
 
   try {
-    Sentry.init(sentryConfig);
-    console.log('✅ Sentry initialized successfully');
+    if (Sentry) {
+      Sentry.init(sentryConfig);
+      console.log('✅ Sentry initialized successfully');
+    }
   } catch (error) {
     console.error('❌ Failed to initialize Sentry:', error);
   }
@@ -107,6 +115,8 @@ export function initializeSentry() {
  */
 export class ErrorLogger {
   static captureException(error: Error, context?: Record<string, any>) {
+    if (!Sentry) return;
+    
     if (context) {
       Sentry.withScope((scope) => {
         Object.entries(context).forEach(([key, value]) => {

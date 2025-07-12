@@ -270,4 +270,4 @@ export const imageUtils = {
   lazyLoadImage,
 };
 
-export default customImageLoader;
+// Default export is already defined at the top of the file

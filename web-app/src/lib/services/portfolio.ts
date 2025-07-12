@@ -385,12 +385,14 @@ export async function getPortfolioData(portfolioId: string): Promise<PortfolioDa
       contact_info: {
         email: user.email,
         phone: user.phone,
-        agent: undefined // TODO: Add agent support
+        // Agent information could be added in the future
+        // Currently not supported in the database schema
+        agent: undefined
       },
       stats: {
         experience_years: calculateExperienceYears(user.date_of_birth),
         projects_completed: imagesByType.gallery.length,
-        view_count: 0 // TODO: Add analytics
+        view_count: portfolio.view_count || 0
       }
     };
 
@@ -581,7 +583,9 @@ export async function getPublishedPortfolioData(slug: string): Promise<Portfolio
       contact_info: {
         email: user.email,
         phone: user.phone,
-        agent: undefined // TODO: Add agent support
+        // Agent information could be added in the future
+        // Currently not supported in the database schema
+        agent: undefined
       },
       stats: {
         experience_years: calculateExperienceYears(user.date_of_birth),

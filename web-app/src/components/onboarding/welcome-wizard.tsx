@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+// Removed framer-motion dependency - using CSS animations instead
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -95,7 +95,7 @@ export function WelcomeWizard({ user, onComplete, onSkip }: WelcomeWizardProps) 
   return (
     <div className="max-w-4xl mx-auto">
       {/* Hero Section */}
-      <motion.div
+      <div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -139,10 +139,10 @@ export function WelcomeWizard({ user, onComplete, onSkip }: WelcomeWizardProps) 
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {/* Platform Stats */}
-      <motion.div
+      <div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -164,10 +164,10 @@ export function WelcomeWizard({ user, onComplete, onSkip }: WelcomeWizardProps) 
             </CardContent>
           </Card>
         ))}
-      </motion.div>
+      </div>
 
       {/* Step Content */}
-      <motion.div
+      <div
         key={currentStep}
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -201,7 +201,7 @@ export function WelcomeWizard({ user, onComplete, onSkip }: WelcomeWizardProps) 
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Progress Indicators */}
       <div className="flex justify-center space-x-2 mb-8">
@@ -257,7 +257,7 @@ export function WelcomeWizard({ user, onComplete, onSkip }: WelcomeWizardProps) 
       </div>
 
       {/* Success Stories Teaser */}
-      <motion.div
+      <div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.8 }}
@@ -290,7 +290,7 @@ export function WelcomeWizard({ user, onComplete, onSkip }: WelcomeWizardProps) 
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

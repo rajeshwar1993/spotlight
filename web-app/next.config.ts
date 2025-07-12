@@ -1,7 +1,13 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 import bundleAnalyzer from '@next/bundle-analyzer';
-import { withSentryConfig } from '@sentry/nextjs';
+// Conditionally import Sentry only when needed
+let withSentryConfig: any = null;
+try {
+  withSentryConfig = require('@sentry/nextjs').withSentryConfig;
+} catch (e) {
+  // Sentry not installed, skip
+}
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
@@ -15,18 +21,24 @@ const isProduction = process.env.NODE_ENV === 'production';
 const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
-    optimizePackageImports: ['lucide-react', '@heroicons/react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react', '@heroicons/react'],
     // Enable parallel builds for better performance
     webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
     // Enable edge runtime for better performance
-    serverComponentsExternalPackages: ['@sentry/nextjs'],
+    // serverComponentsExternalPackages moved to root level in Next.js 15
     // Enable faster builds
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+    // turbo moved to turbopack in Next.js 15
+  },
+  
+  // External packages for server components
+  serverExternalPackages: ['@sentry/nextjs'],
+  
+  // Turbopack configuration
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
@@ -69,7 +81,7 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     // Enable placeholder generation for better UX
-    placeholder: 'blur',
+    // placeholder: 'blur', // Not available in Next.js 15
     // Custom loader for production CDN
     ...(isProduction && {
       loader: 'custom',
@@ -86,8 +98,8 @@ const nextConfig: NextConfig = {
   // Optimize for production builds
   productionBrowserSourceMaps: false,
   
-  // Enable SWC minification for better performance
-  swcMinify: true,
+  // Enable SWC minification for better performance (default in Next.js 15)
+  // swcMinify: true, // Deprecated in Next.js 15
   
   // Optimize for production performance
   poweredByHeader: false,
@@ -105,10 +117,9 @@ const nextConfig: NextConfig = {
       },
       reactRemoveProperties: true,
     },
-    // Enable static file optimization
-    optimizeFonts: true,
-    // Enable image optimization
-    optimizeImages: true,
+    // Font and image optimization are enabled by default in Next.js 15
+    // optimizeFonts: true, // Deprecated
+    // optimizeImages: true, // Deprecated
   }),
   
   // Enhanced bundle optimization
@@ -344,7 +355,7 @@ let config = withNextIntl(nextConfig);
 config = withBundleAnalyzer(config);
 
 // Add Sentry configuration in production
-if (isProduction && process.env.SENTRY_DSN) {
+if (isProduction && process.env.SENTRY_DSN && withSentryConfig) {
   config = withSentryConfig(config, sentryConfig);
 }
 

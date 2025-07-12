@@ -47,8 +47,18 @@ export async function POST(
       return NextResponse.json({ error: 'Failed to duplicate portfolio' }, { status: 500 });
     }
 
-    // TODO: Copy images if needed
-    // This would require implementing image duplication logic
+    // Copy images from the original portfolio to the duplicated portfolio
+    const { duplicatePortfolioImages } = await import('@/lib/services/image');
+    const imageDuplicationResult = await duplicatePortfolioImages(
+      portfolioId,
+      duplicatedPortfolio.id,
+      user.id
+    );
+    
+    if (imageDuplicationResult.error) {
+      console.error('Error duplicating images:', imageDuplicationResult.error);
+      // Continue even if image duplication fails - the portfolio was created successfully
+    }
 
     return NextResponse.json({ data: duplicatedPortfolio }, { status: 201 });
 

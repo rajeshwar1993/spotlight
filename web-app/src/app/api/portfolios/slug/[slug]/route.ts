@@ -140,7 +140,9 @@ async function getPublicPortfolioData(slug: string): Promise<{ data?: PortfolioD
       contact_info: {
         email: user.email,
         phone: user.phone,
-        agent: undefined // TODO: Add agent support when implemented
+        // Agent information could be added in the future
+        // Currently not supported in the database schema
+        agent: undefined
       },
       stats: {
         experience_years: calculateExperienceYears(user.date_of_birth),
