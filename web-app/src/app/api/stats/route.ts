@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { unstable_cache } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
-// Cache stats for 5 minutes
+// Cache stats for 5 minutes - using admin client to avoid cookie dependencies
 const getCachedStats = unstable_cache(
   async () => {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     
     try {
       // Get total users count

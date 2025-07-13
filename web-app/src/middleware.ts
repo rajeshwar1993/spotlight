@@ -1,14 +1,15 @@
-import createMiddleware from 'next-intl/middleware';
+// Temporarily disable i18n until we can test the basic functionality
+// import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
-import { locales, defaultLocale } from './i18n/config';
+// import { locales, defaultLocale } from './i18n/config';
 
 // Create the internationalization middleware
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: 'as-needed', // Only show locale prefix when not default
-  localeDetection: true, // Auto-detect user's preferred locale
-});
+// const intlMiddleware = createMiddleware({
+//   locales,
+//   defaultLocale,
+//   localePrefix: 'as-needed', // Only show locale prefix when not default
+//   localeDetection: true, // Auto-detect user's preferred locale
+// });
 
 export function middleware(request: NextRequest) {
   // Get the pathname
@@ -26,8 +27,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle internationalization
-  const response = intlMiddleware(request);
+  // Handle internationalization - temporarily disabled
+  // const response = intlMiddleware(request);
+  const response = NextResponse.next();
 
   // Add security headers
   response.headers.set('X-Frame-Options', 'DENY');

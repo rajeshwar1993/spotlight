@@ -1,0 +1,378 @@
+
+> web-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.3.4
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.55:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1186ms
+ ✓ Compiled /middleware in 118ms (138 modules)
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1778ms (1285 modules)
+ HEAD / 404 in 2010ms
+ ✓ Compiled in 199ms (557 modules)
+ GET / 404 in 98ms
+ GET /manifest.json 404 in 222ms
+ ✓ Compiled /favicon.ico in 246ms (744 modules)
+ GET / 404 in 375ms
+ GET /auth/signin 404 in 375ms
+ GET /favicon.ico 200 in 641ms
+ GET /auth/signup 404 in 403ms
+ ✓ Compiled in 141ms (108 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 729ms (1384 modules)
+ GET / 200 in 1030ms
+ ✓ Compiled /_not-found in 108ms (791 modules)
+ GET /images/pattern.svg 404 in 303ms
+ GET /images/hero-pattern.svg 404 in 308ms
+ GET /manifest.json 404 in 107ms
+ ○ Compiling /api/stats ...
+ ✓ Compiled /api/stats in 1219ms (1525 modules)
+Error in stats API: Error: Route /api/stats used "cookies" inside a function cached with "unstable_cache(...)". Accessing Dynamic data sources inside a cache scope is not supported. If you need this data inside a cached function use "cookies" outside of the cached function and pass the required dynamic data in as an argument. See more info here: https://nextjs.org/docs/app/api-reference/functions/unstable_cache
+    at createClient (src/lib/supabase/server.ts:7:35)
+    at getCachedStats.revalidate (src/app/api/stats/route.ts:10:39)
+    at async GET (src/app/api/stats/route.ts:162:18)
+   5 |
+   6 | export const createClient = async () => {
+>  7 |   const cookieStore = await cookies();
+     |                                   ^
+   8 |
+   9 |   return createServerClient<Database>(
+  10 |     env.NEXT_PUBLIC_SUPABASE_URL,
+ GET /api/stats 500 in 1405ms
+Error in featured portfolios API: Error: Route /api/portfolios/featured used "cookies" inside a function cached with "unstable_cache(...)". Accessing Dynamic data sources inside a cache scope is not supported. If you need this data inside a cached function use "cookies" outside of the cached function and pass the required dynamic data in as an argument. See more info here: https://nextjs.org/docs/app/api-reference/functions/unstable_cache
+    at createClient (src/lib/supabase/server.ts:7:35)
+    at getCachedFeaturedPortfolios.revalidate (src/app/api/portfolios/featured/route.ts:10:39)
+    at async GET (src/app/api/portfolios/featured/route.ts:97:23)
+   5 |
+   6 | export const createClient = async () => {
+>  7 |   const cookieStore = await cookies();
+     |                                   ^
+   8 |
+   9 |   return createServerClient<Database>(
+  10 |     env.NEXT_PUBLIC_SUPABASE_URL,
+ GET /api/portfolios/featured? 500 in 1431ms
+ GET / 200 in 44ms
+ GET /images/pattern.svg 404 in 213ms
+ GET /images/hero-pattern.svg 404 in 213ms
+ GET /manifest.json 404 in 46ms
+ ✓ Compiled in 487ms (1539 modules)
+ GET / 200 in 84ms
+ GET /images/pattern.svg 404 in 215ms
+ GET /images/hero-pattern.svg 404 in 223ms
+ GET /manifest.json 404 in 43ms
+ ✓ Compiled in 410ms (1401 modules)
+ GET / 200 in 121ms
+ GET /images/hero-pattern.svg 404 in 205ms
+ GET /images/pattern.svg 404 in 207ms
+ GET /manifest.json 404 in 41ms
+ GET / 200 in 202ms
+ GET /images/pattern.svg 404 in 88ms
+ GET /images/hero-pattern.svg 404 in 92ms
+ GET /manifest.json 404 in 96ms
+ ✓ Compiled /api/portfolios/featured in 183ms (927 modules)
+ ✓ Compiled in 1ms (929 modules)
+ ✓ Compiled in 0ms (929 modules)
+ ✓ Compiled in 0ms (929 modules)
+Error fetching users count: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:43:58)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+Error fetching portfolios count: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:51:68)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+Error fetching published portfolios count: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:59:71)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+Error fetching portfolio views: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:67:56)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+Error fetching profession data: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:73:66)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+Error fetching template data: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:83:62)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+Error fetching recent users: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:95:65)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+Error fetching recent portfolios: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedStats.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:103:75)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fstats%2Froute&page=%2Fapi%2Fstats%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fstats%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:183:23)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+ GET /api/stats 200 in 738ms
+Error fetching featured portfolios: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at Object.fetch (node:internal/deps/undici/undici:11730:11)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async getCachedFeaturedPortfolios.revalidate (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fportfolios%2Ffeatured%2Froute&page=%2Fapi%2Fportfolios%2Ffeatured%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fportfolios%2Ffeatured%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:43:41)\n' +
+    '    at async cachedCb (webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/unstable-cache.js:174:32)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fportfolios%2Ffeatured%2Froute&page=%2Fapi%2Fportfolios%2Ffeatured%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fportfolios%2Ffeatured%2Froute.ts&appDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Frajeshwarrudra%2FDocuments%2FDevWork%2Fspotlight%2Fweb-app&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=standalone&preferredRegion=&middlewareConfig=e30%3D!:112:28)\n' +
+    '    at async AppRouteRouteModule.do (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1518:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1920:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2408:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:2445:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:1008:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/base-server.js:900:17)\n' +
+    '    at async /Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/rajeshwarrudra/Documents/DevWork/spotlight/web-app/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+ GET /api/portfolios/featured? 200 in 857ms
+ GET / 200 in 621ms
+ GET / 200 in 8ms
+ GET /images/hero-pattern.svg 404 in 163ms
+ GET /images/pattern.svg 404 in 48ms
+ GET /manifest.json 404 in 44ms
+ GET / 200 in 174ms
+ GET /images/hero-pattern.svg 404 in 49ms
+ GET /images/pattern.svg 404 in 46ms
+ GET /api/portfolios/featured? 200 in 93ms
+ GET /manifest.json 404 in 189ms
+ GET /api/stats 200 in 100ms
+ ○ Compiling /examples ...
+ ✓ Compiled /examples in 1161ms (1458 modules)
+ GET /examples 200 in 1271ms
+ ✓ Compiled /_not-found in 106ms (830 modules)
+ GET /templates 404 in 155ms
+ GET /templates 404 in 131ms
+ GET /manifest.json 404 in 156ms
+ GET / 200 in 172ms
+ GET /images/pattern.svg 404 in 99ms
+ GET /images/hero-pattern.svg 404 in 99ms
+ GET /manifest.json 404 in 152ms
+ ✓ Compiled /api/stats in 126ms (966 modules)
+ ✓ Compiled in 0ms (968 modules)
+ ✓ Compiled in 0ms (968 modules)
+ ✓ Compiled in 0ms (968 modules)
+ GET /api/portfolios/featured? 200 in 632ms
+ GET /api/stats 200 in 828ms
+ GET / 200 in 644ms
+ GET / 200 in 645ms
+ GET / 200 in 17ms
+ GET / 200 in 18ms
+ GET /images/pattern.svg 404 in 354ms
+ GET /images/hero-pattern.svg 404 in 355ms
+ GET /images/pattern.svg 404 in 355ms
+ GET /images/hero-pattern.svg 404 in 355ms
+ GET /manifest.json 404 in 356ms
+ GET /manifest.json 404 in 356ms
+ GET / 200 in 176ms
+ GET /images/pattern.svg 404 in 99ms
+ GET /images/hero-pattern.svg 404 in 103ms
+ GET /api/portfolios/featured? 200 in 115ms
+ GET /manifest.json 404 in 187ms
+ GET /api/stats 200 in 119ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 261ms
+ GET /manifest.json 404 in 277ms
+ GET / 200 in 279ms
+ GET / 200 in 148ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 91ms
+ GET /images/pattern.svg 404 in 197ms
+ GET /images/hero-pattern.svg 404 in 197ms
+ GET /manifest.json 404 in 83ms
+ GET /api/portfolios/featured? 200 in 74ms
+ GET /api/stats 200 in 78ms
